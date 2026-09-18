@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,9 +14,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('admin_token');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)

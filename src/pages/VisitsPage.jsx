@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 export default function VisitsPage() {
   const { token } = useAuth();
@@ -12,19 +13,10 @@ export default function VisitsPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('http://localhost:3000/visits', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setVisits(data.visits || data);
-      } else {
-        setError(data.message || 'Erreur lors du chargement des demandes de visite.');
-      }
+      const response = await api.get('/visits');
+      setVisits(response.data.visits || response.data);
     } catch (err) {
-      setError('Impossible de contacter le serveur.');
+      setError(err.response?.data?.message || 'Erreur lors du chargement des demandes de visite.');
     } finally {
       setLoading(false);
     }
@@ -37,20 +29,10 @@ export default function VisitsPage() {
   // Actions de validation ou de refus d'une visite
   const handleAction = async (id, actionType) => {
     try {
-      const response = await fetch(`http://localhost:3000/visits/${id}/${actionType}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        fetchVisits(); // Actualiser la liste après l'action
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Erreur lors du traitement de l’action.');
-      }
+      await api.patch(`/visits/${id}/${actionType}`);
+      fetchVisits(); // Actualiser la liste après l'action
     } catch (err) {
-      alert('Impossible de contacter le serveur.');
+      alert(err.response?.data?.message || 'Erreur lors du traitement de l\'action.');
     }
   };
 
@@ -113,7 +95,7 @@ export default function VisitsPage() {
       {/* Tableau des Visites */}
       <div style={styles.tableCard}>
         <h3 style={styles.tableTitle}>Liste des Demandes de Visite</h3>
-        
+
         {loading ? (
           <p style={styles.loadingText}>Chargement des données...</p>
         ) : visits.length === 0 ? (
@@ -155,13 +137,13 @@ export default function VisitsPage() {
                     </td>
                     <td style={styles.td}>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        <button 
+                        <button
                           onClick={() => handleAction(visit._id || visit.id, 'accept')}
                           style={styles.acceptBtn}
                         >
                           Valider
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleAction(visit._id || visit.id, 'refuse')}
                           style={styles.refuseBtn}
                         >

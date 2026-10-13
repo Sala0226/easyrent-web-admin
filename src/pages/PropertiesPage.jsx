@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 export default function PropertiesPage() {
   const { token } = useAuth();
@@ -12,19 +13,10 @@ export default function PropertiesPage() {
     setLoading(true);
     setError('');
     try {
-     const response = await fetch('http://localhost:3000/properties', {
-  headers: {
-    'Authorization': `Bearer ${token}`
-  }
-});
-      const data = await response.json();
-      if (response.ok) {
-        setProperties(data.properties || data); // Ajustement selon le format de ton API
-      } else {
-        setError(data.message || 'Erreur lors du chargement des propriétés.');
-      }
+      const response = await api.get('/properties');
+      setProperties(response.data.properties || response.data);
     } catch (err) {
-      setError('Impossible de contacter le serveur.');
+      setError(err.response?.data?.message || 'Erreur lors du chargement des propriétés.');
     } finally {
       setLoading(false);
     }

@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('admin_token', accessToken);
       setToken(accessToken);
-      
-      navigate('/users', { replace: true }); 
+
+      navigate('/dashboard', { replace: true });
       return { success: true };
     } catch (error) {
       return { 

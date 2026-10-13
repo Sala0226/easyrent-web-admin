@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import AdminLayout from './components/AdminLayout';
 import PropertiesPage from './pages/PropertiesPage';
-import VisitsPage from './pages/VisitsPage'; 
+import VisitsPage from './pages/VisitsPage';
 import logoImage from './assets/logo.png';
 
 // --- Composant pour protéger les routes privées ---
@@ -111,12 +112,13 @@ export default function App() {
               <AdminLayout />
             </PrivateRoute>
           }>
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/visits" element={<VisitsPage />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/users" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

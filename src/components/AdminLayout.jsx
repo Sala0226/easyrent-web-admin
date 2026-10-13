@@ -10,6 +10,7 @@ export default function AdminLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
+    { path: '/dashboard', label: 'Tableau de Bord', icon: '📊' },
     { path: '/users', label: 'Utilisateurs', icon: '👥' },
     { path: '/properties', label: 'Propriétés', icon: '🏠' },
     { path: '/visits', label: 'Demandes de Visite', icon: '📅' },

@@ -14,6 +14,7 @@ export default function AdminLayout() {
     { path: '/users', label: 'Utilisateurs', icon: '👥' },
     { path: '/properties', label: 'Propriétés', icon: '🏠' },
     { path: '/visits', label: 'Demandes de Visite', icon: '📅' },
+    { path: '/favorites', label: 'Favoris', icon: '⭐' },
   ];
 
   const handleNavClick = (path) => {

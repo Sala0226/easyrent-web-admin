@@ -5,7 +5,9 @@ import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import AdminLayout from './components/AdminLayout';
 import PropertiesPage from './pages/PropertiesPage';
+import PropertyDetailPage from './pages/PropertyDetailPage';
 import VisitsPage from './pages/VisitsPage';
+import FavoritesPage from './pages/FavoritesPage';
 import logoImage from './assets/logo.png';
 
 // --- Composant pour protéger les routes privées ---
@@ -14,10 +16,29 @@ const PrivateRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" replace />;
 };
 
+// --- Icône œil (affiché / masqué) ---
+const EyeIcon = ({ open }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+    {!open && <line x1="3" y1="3" x2="21" y2="21" />}
+  </svg>
+);
+
 // --- Page de Connexion ---
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -26,10 +47,10 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     const result = await login(email, password);
     setLoading(false);
-    
+
     if (!result.success) {
       setError(result.message);
     }
@@ -61,14 +82,24 @@ const LoginPage = () => {
 
           <div style={loginStyles.inputGroup}>
             <label style={loginStyles.label}>Mot de passe</label>
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              style={loginStyles.input}
-            />
+            <div style={loginStyles.passwordContainer}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={loginStyles.inputWithIcon}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={loginStyles.passwordToggle}
+                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+            </div>
           </div>
 
           <button 
@@ -115,7 +146,9 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties/:id" element={<PropertyDetailPage />} />
             <Route path="/visits" element={<VisitsPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -206,6 +239,35 @@ const loginStyles = {
     backgroundColor: '#f8fafc',
     boxSizing: 'border-box',
     color: '#0f172a',
+  },
+  passwordContainer: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  inputWithIcon: {
+    width: '100%',
+    padding: '12px 45px 12px 14px',
+    fontSize: '14px',
+    border: '1px solid #cbd5e1',
+    borderRadius: '8px',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+    backgroundColor: '#f8fafc',
+    boxSizing: 'border-box',
+    color: '#0f172a',
+  },
+  passwordToggle: {
+    position: 'absolute',
+    right: '12px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: '0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#64748b',
   },
   button: {
     width: '100%',

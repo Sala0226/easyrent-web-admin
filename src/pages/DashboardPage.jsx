@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { RefreshIcon } from '../components/icons';
 
 export default function DashboardPage() {
   const { logout } = useAuth();
@@ -19,9 +20,32 @@ export default function DashboardPage() {
 
       // Récupérer les données depuis le backend endpoint dashboard
       const dashboardResponse = await api.get('/admin/dashboard');
-      
+
       if (dashboardResponse.data) {
-        setStats(dashboardResponse.data);
+        // Vérifier si les stats détaillées sont présentes, sinon les calculer
+        let finalStats = dashboardResponse.data;
+
+        // Si les stats utilisateurs ne sont pas détaillées, on les calcule
+        if (!finalStats.users || typeof finalStats.users.active === 'undefined') {
+          try {
+            const usersRes = await api.get('/admin/users');
+            const users = Array.isArray(usersRes.data) ? usersRes.data : [];
+
+            finalStats = {
+              ...finalStats,
+              users: {
+                total: users.length,
+                active: users.filter(u => u.isActive || u.status === 'active').length,
+                advertisers: users.filter(u => u.role === 'ANNONCEUR' || u.role === 'ADVERTISER').length,
+                admins: users.filter(u => u.role === 'ADMIN').length
+              }
+            };
+          } catch (usersErr) {
+            console.log('Could not fetch users details:', usersErr);
+          }
+        }
+
+        setStats(finalStats);
       } else {
         // Fallback: récupérer les données séparément si le dashboard endpoint ne retourne pas tout
         const [usersRes, propertiesRes, visitsRes] = await Promise.all([
@@ -30,14 +54,14 @@ export default function DashboardPage() {
           api.get('/visits')
         ]);
 
-        const users = usersRes.data || [];
+        const users = Array.isArray(usersRes.data) ? usersRes.data : [];
         const properties = propertiesRes.data.properties || propertiesRes.data || [];
         const visits = visitsRes.data.visits || visitsRes.data || [];
 
         setStats({
           users: {
             total: users.length,
-            active: users.filter(u => u.isActive).length,
+            active: users.filter(u => u.isActive || u.status === 'active').length,
             advertisers: users.filter(u => u.role === 'ANNONCEUR' || u.role === 'ADVERTISER').length,
             admins: users.filter(u => u.role === 'ADMIN').length
           },
@@ -99,8 +123,8 @@ export default function DashboardPage() {
           <p style={styles.subtitle}>Vue d'ensemble de la plateforme EasyRent</p>
         </div>
         <div style={styles.headerActions}>
-          <button onClick={fetchDashboardStats} style={styles.refreshButton}>
-            🔄 Actualiser
+          <button onClick={() => { refresh(); fetchDashboard(); }} style={styles.refreshButton}>
+            <RefreshIcon size={16} /> Actualiser
           </button>
         </div>
       </div>
@@ -108,86 +132,32 @@ export default function DashboardPage() {
       {/* Cartes statistiques principales */}
       <div style={styles.mainStatsGrid}>
         {/* Carte Utilisateurs */}
-        <div style={styles.statCard}>
-          <div style={styles.cardHeader}>
-            <div style={{ ...styles.cardIcon, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' }}>
-              👥
-            </div>
-            <div style={styles.cardHeaderContent}>
-              <p style={styles.cardLabel}>Utilisateurs</p>
-              <h2 style={styles.cardValue}>{stats.users.total}</h2>
-            </div>
-          </div>
-          <div style={styles.cardDivider}></div>
-          <div style={styles.cardDetails}>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>✅</span>
-              <span style={styles.detailText}>Actifs: <strong>{stats.users.active}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>🏠</span>
-              <span style={styles.detailText}>Annonceurs: <strong>{stats.users.advertisers}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>🛡️</span>
-              <span style={styles.detailText}>Admins: <strong>{stats.users.admins}</strong></span>
-            </div>
+        <div style={styles.compactStatCard}>
+          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>👥</div>
+          <div>
+            <p style={styles.compactLabel}>Utilisateurs</p>
+            <h3 style={styles.compactValue}>{stats.users.total}</h3>
+            <p style={styles.compactSubtext}>Actifs: {stats.users.active} | Annonceurs: {stats.users.advertisers}</p>
           </div>
         </div>
 
         {/* Carte Propriétés */}
-        <div style={styles.statCard}>
-          <div style={styles.cardHeader}>
-            <div style={{ ...styles.cardIcon, background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-              🏠
-            </div>
-            <div style={styles.cardHeaderContent}>
-              <p style={styles.cardLabel}>Propriétés</p>
-              <h2 style={styles.cardValue}>{stats.properties.total}</h2>
-            </div>
-          </div>
-          <div style={styles.cardDivider}></div>
-          <div style={styles.cardDetails}>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>✅</span>
-              <span style={styles.detailText}>Disponibles: <strong>{stats.properties.available}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>🔑</span>
-              <span style={styles.detailText}>Louées: <strong>{stats.properties.rented}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>⏳</span>
-              <span style={styles.detailText}>En attente: <strong>{stats.properties.pending}</strong></span>
-            </div>
+        <div style={styles.compactStatCard}>
+          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>🏠</div>
+          <div>
+            <p style={styles.compactLabel}>Propriétés</p>
+            <h3 style={styles.compactValue}>{stats.properties.total}</h3>
+            <p style={styles.compactSubtext}>Disponibles: {stats.properties.available} | Louées: {stats.properties.rented}</p>
           </div>
         </div>
 
         {/* Carte Visites */}
-        <div style={styles.statCard}>
-          <div style={styles.cardHeader}>
-            <div style={{ ...styles.cardIcon, background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-              📅
-            </div>
-            <div style={styles.cardHeaderContent}>
-              <p style={styles.cardLabel}>Visites</p>
-              <h2 style={styles.cardValue}>{stats.visits.total}</h2>
-            </div>
-          </div>
-          <div style={styles.cardDivider}></div>
-          <div style={styles.cardDetails}>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>⏳</span>
-              <span style={styles.detailText}>En attente: <strong>{stats.visits.pending}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>✅</span>
-              <span style={styles.detailText}>Acceptées: <strong>{stats.visits.accepted}</strong></span>
-            </div>
-            <div style={styles.detailItem}>
-              <span style={styles.detailIcon}>❌</span>
-              <span style={styles.detailText}>Refusées: <strong>{stats.visits.refused}</strong></span>
-            </div>
+        <div style={styles.compactStatCard}>
+          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>📅</div>
+          <div>
+            <p style={styles.compactLabel}>Visites</p>
+            <h3 style={styles.compactValue}>{stats.visits.total}</h3>
+            <p style={styles.compactSubtext}>En attente: {stats.visits.pending} | Acceptées: {stats.visits.accepted} | Refusées: {stats.visits.refused}</p>
           </div>
         </div>
       </div>
@@ -227,8 +197,8 @@ export default function DashboardPage() {
           <div>
             <p style={styles.infoLabel}>Taux d'activation</p>
             <p style={styles.infoValue}>
-              {stats.users.total > 0 
-                ? Math.round((stats.users.active / stats.users.total) * 100) 
+              {stats.users.total > 0
+                ? Math.round((stats.users.active / stats.users.total) * 100)
                 : 0}%
             </p>
           </div>
@@ -238,8 +208,8 @@ export default function DashboardPage() {
           <div>
             <p style={styles.infoLabel}>Taux de disponibilité</p>
             <p style={styles.infoValue}>
-              {stats.properties.total > 0 
-                ? Math.round((stats.properties.available / stats.properties.total) * 100) 
+              {stats.properties.total > 0
+                ? Math.round((stats.properties.available / stats.properties.total) * 100)
                 : 0}%
             </p>
           </div>
@@ -337,73 +307,46 @@ const styles = {
   },
   mainStatsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '24px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '20px',
     marginBottom: '30px',
   },
-  statCard: {
+  compactStatCard: {
     backgroundColor: '#ffffff',
-    borderRadius: '16px',
-    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-  },
-  cardHeader: {
+    padding: '20px',
+    borderRadius: '12px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
-    padding: '24px',
+    border: '1px solid #e2e8f0',
   },
-  cardIcon: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '14px',
+  compactIcon: {
+    width: '56px',
+    height: '56px',
+    borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '28px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    fontSize: '26px',
+    flexShrink: 0,
   },
-  cardHeaderContent: {
-    flex: 1,
-  },
-  cardLabel: {
+  compactLabel: {
     margin: 0,
     fontSize: '13px',
     color: '#64748b',
     fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
   },
-  cardValue: {
+  compactValue: {
     margin: '4px 0 0 0',
-    fontSize: '32px',
+    fontSize: '28px',
     fontWeight: '800',
     color: '#0f172a',
   },
-  cardDivider: {
-    height: '1px',
-    backgroundColor: '#e2e8f0',
-    margin: '0 24px',
-  },
-  cardDetails: {
-    padding: '20px 24px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  detailItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  detailIcon: {
-    fontSize: '16px',
-  },
-  detailText: {
-    fontSize: '14px',
-    color: '#475569',
+  compactSubtext: {
+    margin: '4px 0 0 0',
+    fontSize: '12px',
+    color: '#64748b',
   },
   quickActionsSection: {
     marginBottom: '30px',

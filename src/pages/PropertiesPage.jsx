@@ -1,75 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import usePaginatedFetch from '../hooks/usePaginatedFetch';
+import Pagination from '../components/Pagination';
+import IconButton from '../components/IconButton';
+import { EyeIcon, PowerIcon, RefreshIcon } from '../components/icons';
 
 export default function PropertiesPage() {
   const { token } = useAuth();
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  // Fonction de récupération des propriétés depuis l'API
-  const fetchProperties = async () => {
-    setLoading(true);
-    setError('');
+  const {
+    items: rawProperties,
+    total,
+    page,
+    setPage,
+    totalPages,
+    loading,
+    error: fetchError,
+    refresh,
+  } = usePaginatedFetch('/admin/properties', 5);
+
+  const properties = Array.isArray(rawProperties) ? rawProperties : [];
+
+  const [dashboardStats, setDashboardStats] = useState({
+    total: 0,
+    pending: 0,
+    validated: 0,
+    refused: 0,
+    suspended: 0,
+  });
+
+  const [actionError, setActionError] = useState('');
+
+  const fetchDashboard = async () => {
     try {
-      const response = await api.get('/properties');
-      setProperties(response.data.properties || response.data);
+      const res = await api.get('/admin/dashboard');
+      if (res.data && res.data.properties) {
+        setDashboardStats(res.data.properties);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors du chargement des propriétés.');
-    } finally {
-      setLoading(false);
+      console.error('Erreur chargement dashboard properties', err);
     }
   };
 
   useEffect(() => {
-    fetchProperties();
+    fetchDashboard();
   }, [token]);
 
-  // Calcul dynamique des KPIs
-  const totalProperties = properties.length;
-  const availableProperties = properties.filter(p => p.status === 'available' || p.status === 'disponible').length;
-  const rentedProperties = properties.filter(p => p.status === 'rented' || p.status === 'loué').length;
-  const pendingProperties = properties.filter(p => p.status === 'pending' || p.status === 'en attente').length;
+  const handleUpdateStatus = async (id, newStatus) => {
+    setActionError('');
+    try {
+      await api.patch(`/admin/properties/${id}/status`, { status: newStatus });
+      refresh();
+      fetchDashboard();
+    } catch (err) {
+      setActionError(err.response?.data?.message || 'Erreur lors de la modification du statut.');
+    }
+  };
+
+  const displayError = actionError || fetchError;
 
   return (
     <div style={styles.container}>
-      {/* En-tête de la page */}
       <div style={styles.pageHeader}>
         <div>
           <h1 style={styles.title}>Gestion des Propriétés</h1>
           <p style={styles.subtitle}>Suivi global et modération des annonces immobilières</p>
         </div>
-        <button onClick={fetchProperties} style={styles.refreshButton}>
-          🔄 Actualiser
+        <button onClick={() => { refresh(); fetchDashboard(); }} style={styles.refreshButton}>
+          <RefreshIcon size={16} /> Actualiser
         </button>
       </div>
 
-      {error && <div style={styles.errorAlert}>{error}</div>}
+      {displayError && <div style={styles.errorAlert}>{displayError}</div>}
 
-      {/* Grille des KPIs */}
       <div style={styles.kpiGrid}>
         <div style={styles.kpiCard}>
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>🏠</div>
           <div>
             <p style={styles.kpiLabel}>Total Propriétés</p>
-            <h3 style={styles.kpiValue}>{totalProperties}</h3>
+            <h3 style={styles.kpiValue}>{dashboardStats.total}</h3>
           </div>
         </div>
 
         <div style={styles.kpiCard}>
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>✅</div>
           <div>
-            <p style={styles.kpiLabel}>Disponibles</p>
-            <h3 style={styles.kpiValue}>{availableProperties}</h3>
-          </div>
-        </div>
-
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>🔑</div>
-          <div>
-            <p style={styles.kpiLabel}>Loués / Occupés</p>
-            <h3 style={styles.kpiValue}>{rentedProperties}</h3>
+            <p style={styles.kpiLabel}>Validées</p>
+            <h3 style={styles.kpiValue}>{dashboardStats.validated}</h3>
           </div>
         </div>
 
@@ -77,15 +97,22 @@ export default function PropertiesPage() {
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>⏳</div>
           <div>
             <p style={styles.kpiLabel}>En Attente</p>
-            <h3 style={styles.kpiValue}>{pendingProperties}</h3>
+            <h3 style={styles.kpiValue}>{dashboardStats.pending}</h3>
+          </div>
+        </div>
+
+        <div style={styles.kpiCard}>
+          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>🚫</div>
+          <div>
+            <p style={styles.kpiLabel}>Refusées / Suspendues</p>
+            <h3 style={styles.kpiValue}>{(dashboardStats.refused || 0) + (dashboardStats.suspended || 0)}</h3>
           </div>
         </div>
       </div>
 
-      {/* Tableau des Propriétés */}
       <div style={styles.tableCard}>
         <h3 style={styles.tableTitle}>Liste des Annonces</h3>
-        
+
         {loading ? (
           <p style={styles.loadingText}>Chargement des données...</p>
         ) : properties.length === 0 ? (
@@ -98,38 +125,77 @@ export default function PropertiesPage() {
                   <th style={styles.th}>Titre / Bien</th>
                   <th style={styles.th}>Type</th>
                   <th style={styles.th}>Prix</th>
+                  <th style={styles.th}>Favoris</th>
                   <th style={styles.th}>Statut</th>
                   <th style={styles.th}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {properties.map((prop) => (
-                  <tr key={prop._id || prop.id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <strong style={{ color: '#0f172a' }}>{prop.title}</strong>
-                      <div style={styles.tdSub}>{prop.city || prop.address}</div>
-                    </td>
-                    <td style={styles.td}>{prop.type || 'Appartement'}</td>
-                    <td style={styles.td}>
-                      <strong>{prop.price ? `${prop.price} FCFA` : 'N/C'}</strong>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={{
-                        ...styles.badge,
-                        backgroundColor: (prop.status === 'available' || prop.status === 'disponible') ? '#d1fae5' : '#fee2e2',
-                        color: (prop.status === 'available' || prop.status === 'disponible') ? '#065f46' : '#991b1b',
-                      }}>
-                        {prop.status || 'Actif'}
-                      </span>
-                    </td>
-                    <td style={styles.td}>
-                      <button style={styles.actionBtn}>Détails</button>
-                    </td>
-                  </tr>
-                ))}
+                {properties.map((prop) => {
+                  const favCount = prop._count?.favorites || 0;
+                  const isPending = prop.status === 'EN_ATTENTE';
+                  const isValidated = prop.status === 'VALIDEE';
+
+                  return (
+                    <tr key={prop.id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <strong style={{ color: '#0f172a' }}>{prop.title}</strong>
+                        <div style={styles.tdSub}>{prop.city || prop.address}</div>
+                      </td>
+                      <td style={styles.td}>{prop.type}</td>
+                      <td style={styles.td}>
+                        <strong>{prop.price ? `${prop.price.toLocaleString()} FCFA` : 'N/C'}</strong>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={styles.favoriteBadge}>⭐ {favCount}</span>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          ...styles.badge,
+                          backgroundColor: isValidated ? '#d1fae5' : isPending ? '#fef3c7' : '#fee2e2',
+                          color: isValidated ? '#065f46' : isPending ? '#92400e' : '#991b1b',
+                        }}>
+                          {prop.status}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {/* Voir les détails */}
+                          <IconButton
+                            icon={<EyeIcon size={16} />}
+                            tooltip="Voir les détails"
+                            onClick={() => navigate(`/properties/${prop.id}`)}
+                          />
+
+                          {/* Suspendre ou Activer la propriété */}
+                          <IconButton
+                            icon={
+                              <PowerIcon
+                                size={16}
+                                color={prop.status === 'SUSPENDUE' ? '#10b981' : '#ef4444'}
+                              />
+                            }
+                            tooltip={prop.status === 'SUSPENDUE' ? 'Activer la propriété' : 'Suspendre la propriété'}
+                            onClick={() => handleUpdateStatus(prop.id, prop.status === 'SUSPENDUE' ? 'VALIDEE' : 'SUSPENDUE')}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && properties.length > 0 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            total={total}
+            limit={5}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>
@@ -169,6 +235,9 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
   },
   errorAlert: {
     backgroundColor: '#fef2f2',
@@ -271,14 +340,13 @@ const styles = {
     fontWeight: '600',
     display: 'inline-block',
   },
-  actionBtn: {
-    padding: '6px 12px',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    color: '#3b82f6',
-    border: 'none',
-    borderRadius: '6px',
+  favoriteBadge: {
     fontWeight: '600',
-    cursor: 'pointer',
+    color: '#d97706',
+    backgroundColor: '#fef3c7',
+    padding: '4px 8px',
+    borderRadius: '12px',
+    fontSize: '12px',
   },
   loadingText: {
     textAlign: 'center',

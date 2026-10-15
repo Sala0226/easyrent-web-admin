@@ -1,46 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import usePaginatedFetch from '../hooks/usePaginatedFetch';
+import Pagination from '../components/Pagination';
+import { RefreshIcon } from '../components/icons';
 
 export default function VisitsPage() {
   const { token } = useAuth();
-  const [visits, setVisits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  
+  const LIMIT = 5;
 
-  // Récupération des demandes de visite depuis l'API
-  const fetchVisits = async () => {
-    setLoading(true);
-    setError('');
+  const {
+    items: rawVisits,
+    total,
+    page,
+    setPage,
+    totalPages,
+    loading,
+    error: fetchError,
+    refresh,
+  } = usePaginatedFetch('/admin/visits', LIMIT);
+
+  const visits = Array.isArray(rawVisits) ? rawVisits : [];
+
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    accepted: 0,
+    refused: 0
+  });
+
+  const fetchDashboardStats = async () => {
     try {
-      const response = await api.get('/visits');
-      setVisits(response.data.visits || response.data);
+      const res = await api.get('/admin/dashboard');
+      if (res.data && res.data.visits) {
+        setStats({
+          total: res.data.visits.total || 0,
+          pending: res.data.visits.pending || 0,
+          accepted: res.data.visits.accepted || 0,
+          refused: res.data.visits.refused || 0
+        });
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur lors du chargement des demandes de visite.');
-    } finally {
-      setLoading(false);
+      console.error('Erreur chargement dashboard visits', err);
     }
   };
 
   useEffect(() => {
-    fetchVisits();
+    fetchDashboardStats();
   }, [token]);
 
-  // Actions de validation ou de refus d'une visite
-  const handleAction = async (id, actionType) => {
-    try {
-      await api.patch(`/visits/${id}/${actionType}`);
-      fetchVisits(); // Actualiser la liste après l'action
-    } catch (err) {
-      alert(err.response?.data?.message || 'Erreur lors du traitement de l\'action.');
-    }
+  // Fonction pour formater et traduire le statut en français
+  const formatStatus = (status) => {
+    if (!status) return 'En attente';
+    const upper = status.toUpperCase();
+    if (upper === 'ACCEPTED' || upper === 'ACCEPTEE') return 'Acceptée';
+    if (upper === 'REFUSED' || upper === 'REFUSEE') return 'Refusée';
+    if (upper === 'PENDING' || upper === 'EN_ATTENTE') return 'En attente';
+    return status;
   };
-
-  // Calcul dynamique des KPIs
-  const totalVisits = visits.length;
-  const pendingVisits = visits.filter(v => v.status === 'pending' || v.status === 'en attente').length;
-  const acceptedVisits = visits.filter(v => v.status === 'accepted' || v.status === 'accepté').length;
-  const refusedVisits = visits.filter(v => v.status === 'refused' || v.status === 'refusé').length;
 
   return (
     <div style={styles.container}>
@@ -48,14 +66,14 @@ export default function VisitsPage() {
       <div style={styles.pageHeader}>
         <div>
           <h1 style={styles.title}>Demandes de Visite</h1>
-          <p style={styles.subtitle}>Suivi et modération des programmations de visite</p>
+          <p style={styles.subtitle}>Suivi global des programmations de visite sur la plateforme</p>
         </div>
-        <button onClick={fetchVisits} style={styles.refreshButton}>
-          🔄 Actualiser
+        <button onClick={() => { refresh(); fetchDashboardStats(); }} style={styles.refreshButton}>
+          <RefreshIcon size={16} /> Actualiser
         </button>
       </div>
 
-      {error && <div style={styles.errorAlert}>{error}</div>}
+      {fetchError && <div style={styles.errorAlert}>{fetchError}</div>}
 
       {/* Grille des KPIs */}
       <div style={styles.kpiGrid}>
@@ -63,7 +81,7 @@ export default function VisitsPage() {
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>📅</div>
           <div>
             <p style={styles.kpiLabel}>Total Demandes</p>
-            <h3 style={styles.kpiValue}>{totalVisits}</h3>
+            <h3 style={styles.kpiValue}>{stats.total}</h3>
           </div>
         </div>
 
@@ -71,7 +89,7 @@ export default function VisitsPage() {
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>⏳</div>
           <div>
             <p style={styles.kpiLabel}>En Attente</p>
-            <h3 style={styles.kpiValue}>{pendingVisits}</h3>
+            <h3 style={styles.kpiValue}>{stats.pending}</h3>
           </div>
         </div>
 
@@ -79,15 +97,15 @@ export default function VisitsPage() {
           <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>✅</div>
           <div>
             <p style={styles.kpiLabel}>Acceptées</p>
-            <h3 style={styles.kpiValue}>{acceptedVisits}</h3>
+            <h3 style={styles.kpiValue}>{stats.accepted}</h3>
           </div>
         </div>
 
         <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>❌</div>
+          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>🚫</div>
           <div>
             <p style={styles.kpiLabel}>Refusées</p>
-            <h3 style={styles.kpiValue}>{refusedVisits}</h3>
+            <h3 style={styles.kpiValue}>{stats.refused}</h3>
           </div>
         </div>
       </div>
@@ -109,53 +127,63 @@ export default function VisitsPage() {
                   <th style={styles.th}>Demandeur</th>
                   <th style={styles.th}>Date souhaitée</th>
                   <th style={styles.th}>Statut</th>
-                  <th style={styles.th}>Actions</th>
+                  <th style={styles.th}>Annonceur</th>
                 </tr>
               </thead>
               <tbody>
-                {visits.map((visit) => (
-                  <tr key={visit._id || visit.id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <strong style={{ color: '#0f172a' }}>{visit.property?.title || 'Bien immobilier'}</strong>
-                      <div style={styles.tdSub}>{visit.property?.city || ''}</div>
-                    </td>
-                    <td style={styles.td}>
-                      <strong>{visit.user?.name || visit.visitorName || 'Utilisateur'}</strong>
-                      <div style={styles.tdSub}>{visit.user?.email || visit.visitorEmail || ''}</div>
-                    </td>
-                    <td style={styles.td}>
-                      {visit.date ? new Date(visit.date).toLocaleDateString() : 'Non spécifiée'}
-                    </td>
-                    <td style={styles.td}>
-                      <span style={{
-                        ...styles.badge,
-                        backgroundColor: (visit.status === 'accepted' || visit.status === 'accepté') ? '#d1fae5' : (visit.status === 'refused' || visit.status === 'refusé') ? '#fee2e2' : '#fef3c7',
-                        color: (visit.status === 'accepted' || visit.status === 'accepté') ? '#065f46' : (visit.status === 'refused' || visit.status === 'refusé') ? '#991b1b' : '#92400e',
-                      }}>
-                        {visit.status || 'En attente'}
-                      </span>
-                    </td>
-                    <td style={styles.td}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          onClick={() => handleAction(visit._id || visit.id, 'accept')}
-                          style={styles.acceptBtn}
-                        >
-                          Valider
-                        </button>
-                        <button
-                          onClick={() => handleAction(visit._id || visit.id, 'refuse')}
-                          style={styles.refuseBtn}
-                        >
-                          Refuser
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {visits.map((visit) => {
+                  const status = (visit.status || '').toUpperCase();
+                  const isAccepted = status === 'ACCEPTEE' || status === 'ACCEPTED';
+                  const isRefused = status === 'REFUSEE' || status === 'REFUSED';
+                  const frenchStatus = formatStatus(visit.status);
+
+                  return (
+                    <tr key={visit.id || visit._id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <strong style={{ color: '#0f172a' }}>{visit.property?.title || 'Bien immobilier'}</strong>
+                        <div style={styles.tdSub}>{visit.property?.city || visit.property?.address || ''}</div>
+                      </td>
+                      <td style={styles.td}>
+                        <strong>{visit.user?.name || visit.visitorName || 'Utilisateur'}</strong>
+                        <div style={styles.tdSub}>{visit.user?.email || visit.visitorEmail || ''}</div>
+                      </td>
+                      <td style={styles.td}>
+                        {visit.date ? new Date(visit.date).toLocaleDateString() : 'Non spécifiée'}
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          ...styles.badge,
+                          backgroundColor: isAccepted ? '#d1fae5' : isRefused ? '#fee2e2' : '#fef3c7',
+                          color: isAccepted ? '#065f46' : isRefused ? '#991b1b' : '#92400e',
+                        }}>
+                          {frenchStatus}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <strong style={{ color: '#334155' }}>
+                          {visit.owner?.name || 'Non assigné'}
+                        </strong>
+                        <div style={styles.tdSub}>
+                          {visit.owner?.email || ''}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && visits.length > 0 && (
+          <Pagination 
+            currentPage={page} 
+            totalPages={totalPages} 
+            total={total}
+            limit={LIMIT}
+            onPageChange={setPage} 
+          />
         )}
       </div>
     </div>
@@ -195,6 +223,9 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
   },
   errorAlert: {
     backgroundColor: '#fef2f2',
@@ -296,24 +327,6 @@ const styles = {
     fontSize: '12px',
     fontWeight: '600',
     display: 'inline-block',
-  },
-  acceptBtn: {
-    padding: '6px 12px',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    color: '#10b981',
-    border: 'none',
-    borderRadius: '6px',
-    fontWeight: '600',
-    cursor: 'pointer',
-  },
-  refuseBtn: {
-    padding: '6px 12px',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    color: '#ef4444',
-    border: 'none',
-    borderRadius: '6px',
-    fontWeight: '600',
-    cursor: 'pointer',
   },
   loadingText: {
     textAlign: 'center',

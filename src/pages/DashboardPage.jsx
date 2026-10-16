@@ -22,30 +22,65 @@ export default function DashboardPage() {
       const dashboardResponse = await api.get('/admin/dashboard');
 
       if (dashboardResponse.data) {
-        // Vérifier si les stats détaillées sont présentes, sinon les calculer
-        let finalStats = dashboardResponse.data;
+        // Utiliser les stats du dashboard endpoint pour les totaux
+        // Mais récupérer tous les utilisateurs pour calculer correctement les actifs
+        const dashboardData = dashboardResponse.data;
 
-        // Si les stats utilisateurs ne sont pas détaillées, on les calcule
-        if (!finalStats.users || typeof finalStats.users.active === 'undefined') {
-          try {
-            const usersRes = await api.get('/admin/users');
-            const users = Array.isArray(usersRes.data) ? usersRes.data : [];
+        try {
+          // Récupérer tous les utilisateurs sans pagination
+          const usersRes = await api.get('/admin/users?limit=1000');
+          const users = Array.isArray(usersRes.data)
+            ? usersRes.data
+            : Array.isArray(usersRes.data?.users)
+            ? usersRes.data.users
+            : Array.isArray(usersRes.data?.data)
+            ? usersRes.data.data
+            : [];
 
-            finalStats = {
-              ...finalStats,
-              users: {
-                total: users.length,
-                active: users.filter(u => u.isActive || u.status === 'active').length,
-                advertisers: users.filter(u => u.role === 'ANNONCEUR' || u.role === 'ADVERTISER').length,
-                admins: users.filter(u => u.role === 'ADMIN').length
-              }
-            };
-          } catch (usersErr) {
-            console.log('Could not fetch users details:', usersErr);
-          }
+          setStats({
+            users: {
+              total: users.length,
+              active: users.filter(u => u.isActive || u.status === 'active').length,
+              advertisers: users.filter(u => u.role === 'ANNONCEUR' || u.role === 'ADVERTISER').length,
+              admins: users.filter(u => u.role === 'ADMIN').length
+            },
+            properties: {
+              total: dashboardData.properties?.total || 0,
+              available: dashboardData.properties?.available || 0,
+              rented: dashboardData.properties?.rented || 0,
+              pending: dashboardData.properties?.pending || 0
+            },
+            visits: {
+              total: dashboardData.visits?.total || 0,
+              pending: dashboardData.visits?.pending || 0,
+              accepted: dashboardData.visits?.accepted || 0,
+              refused: dashboardData.visits?.refused || 0
+            }
+          });
+        } catch (usersErr) {
+          console.log('Could not fetch users details:', usersErr);
+          // Fallback: utiliser les stats du dashboard
+          setStats({
+            users: {
+              total: dashboardData.users?.total || 0,
+              active: dashboardData.users?.active || 0,
+              advertisers: dashboardData.users?.annonceurs || dashboardData.users?.advertisers || 0,
+              admins: dashboardData.users?.admins || 0
+            },
+            properties: {
+              total: dashboardData.properties?.total || 0,
+              available: dashboardData.properties?.available || 0,
+              rented: dashboardData.properties?.rented || 0,
+              pending: dashboardData.properties?.pending || 0
+            },
+            visits: {
+              total: dashboardData.visits?.total || 0,
+              pending: dashboardData.visits?.pending || 0,
+              accepted: dashboardData.visits?.accepted || 0,
+              refused: dashboardData.visits?.refused || 0
+            }
+          });
         }
-
-        setStats(finalStats);
       } else {
         // Fallback: récupérer les données séparément si le dashboard endpoint ne retourne pas tout
         const [usersRes, propertiesRes, visitsRes] = await Promise.all([
@@ -54,7 +89,14 @@ export default function DashboardPage() {
           api.get('/visits')
         ]);
 
-        const users = Array.isArray(usersRes.data) ? usersRes.data : [];
+        // Handle different response structures for users
+        const users = Array.isArray(usersRes.data)
+          ? usersRes.data
+          : Array.isArray(usersRes.data?.users)
+          ? usersRes.data.users
+          : Array.isArray(usersRes.data?.data)
+          ? usersRes.data.data
+          : [];
         const properties = propertiesRes.data.properties || propertiesRes.data || [];
         const visits = visitsRes.data.visits || visitsRes.data || [];
 
@@ -123,7 +165,7 @@ export default function DashboardPage() {
           <p style={styles.subtitle}>Vue d'ensemble de la plateforme EasyRent</p>
         </div>
         <div style={styles.headerActions}>
-          <button onClick={() => { refresh(); fetchDashboard(); }} style={styles.refreshButton}>
+          <button onClick={fetchDashboardStats} style={styles.refreshButton}>
             <RefreshIcon size={16} /> Actualiser
           </button>
         </div>

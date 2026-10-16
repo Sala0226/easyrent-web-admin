@@ -63,71 +63,88 @@ export default function PropertiesPage() {
   const displayError = actionError || fetchError;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.pageHeader}>
+    <div className="max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 style={styles.title}>Gestion des Propriétés</h1>
-          <p style={styles.subtitle}>Suivi global et modération des annonces immobilières</p>
+          <h1 className="text-2xl font-extrabold text-slate-900 m-0">Gestion des Propriétés</h1>
+          <p className="text-sm text-slate-500 mt-1">Suivi global et modération des annonces immobilières</p>
         </div>
-        <button onClick={() => { refresh(); fetchDashboard(); }} style={styles.refreshButton}>
+        <button
+          onClick={() => { refresh(); fetchDashboard(); }}
+          className="px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
+        >
           <RefreshIcon size={16} /> Actualiser
         </button>
       </div>
 
-      {displayError && <div style={styles.errorAlert}>{displayError}</div>}
+      {displayError && (
+        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm mb-5 border border-red-200">
+          {displayError}
+        </div>
+      )}
 
-      <div style={styles.kpiGrid}>
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>🏠</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
+            🏠
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Total Propriétés</p>
-            <h3 style={styles.kpiValue}>{dashboardStats.total}</h3>
+            <p className="text-xs font-semibold text-slate-500 m-0">Total Propriétés</p>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{dashboardStats.total}</h3>
           </div>
         </div>
 
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>✅</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
+            ✅
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Validées</p>
-            <h3 style={styles.kpiValue}>{dashboardStats.validated}</h3>
+            <p className="text-xs font-semibold text-slate-500 m-0">Validées</p>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{dashboardStats.validated}</h3>
           </div>
         </div>
 
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>⏳</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
+            ⏳
+          </div>
           <div>
-            <p style={styles.kpiLabel}>En Attente</p>
-            <h3 style={styles.kpiValue}>{dashboardStats.pending}</h3>
+            <p className="text-xs font-semibold text-slate-500 m-0">En Attente</p>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{dashboardStats.pending}</h3>
           </div>
         </div>
 
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>🚫</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-red-50 text-red-500 font-bold">
+            🚫
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Refusées / Suspendues</p>
-            <h3 style={styles.kpiValue}>{(dashboardStats.refused || 0) + (dashboardStats.suspended || 0)}</h3>
+            <p className="text-xs font-semibold text-slate-500 m-0">Refusées / Suspendues</p>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">
+              {(dashboardStats.refused || 0) + (dashboardStats.suspended || 0)}
+            </h3>
           </div>
         </div>
       </div>
 
-      <div style={styles.tableCard}>
-        <h3 style={styles.tableTitle}>Liste des Annonces</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-5">
+        <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Annonces</h3>
 
         {loading ? (
-          <p style={styles.loadingText}>Chargement des données...</p>
+          <p className="text-center py-8 text-slate-500">Chargement des données...</p>
         ) : properties.length === 0 ? (
-          <p style={styles.emptyText}>Aucune propriété trouvée sur la plateforme.</p>
+          <p className="text-center py-8 text-slate-500">Aucune propriété trouvée sur la plateforme.</p>
         ) : (
-          <div style={styles.tableResponsive}>
-            <table style={styles.table}>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
               <thead>
-                <tr style={styles.trHeader}>
-                  <th style={styles.th}>Titre / Bien</th>
-                  <th style={styles.th}>Type</th>
-                  <th style={styles.th}>Prix</th>
-                  <th style={styles.th}>Favoris</th>
-                  <th style={styles.th}>Statut</th>
-                  <th style={styles.th}>Actions</th>
+                <tr className="border-b-2 border-slate-200 bg-slate-50">
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Titre / Bien</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Type</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Prix</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Favoris</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,29 +154,35 @@ export default function PropertiesPage() {
                   const isValidated = prop.status === 'VALIDEE';
 
                   return (
-                    <tr key={prop.id} style={styles.tr}>
-                      <td style={styles.td}>
-                        <strong style={{ color: '#0f172a' }}>{prop.title}</strong>
-                        <div style={styles.tdSub}>{prop.city || prop.address}</div>
+                    <tr key={prop.id} className="border-b border-slate-100">
+                      <td className="px-4 py-3.5 text-sm text-slate-700">
+                        <strong className="text-slate-900">{prop.title}</strong>
+                        <div className="text-xs text-slate-500 mt-0.5">{prop.city || prop.address}</div>
                       </td>
-                      <td style={styles.td}>{prop.type}</td>
-                      <td style={styles.td}>
+                      <td className="px-4 py-3.5 text-sm text-slate-700">{prop.type}</td>
+                      <td className="px-4 py-3.5 text-sm text-slate-700">
                         <strong>{prop.price ? `${prop.price.toLocaleString()} FCFA` : 'N/C'}</strong>
                       </td>
-                      <td style={styles.td}>
-                        <span style={styles.favoriteBadge}>⭐ {favCount}</span>
+                      <td className="px-4 py-3.5 text-sm text-slate-700">
+                        <span className="font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg text-xs">
+                          ⭐ {favCount}
+                        </span>
                       </td>
-                      <td style={styles.td}>
-                        <span style={{
-                          ...styles.badge,
-                          backgroundColor: isValidated ? '#d1fae5' : isPending ? '#fef3c7' : '#fee2e2',
-                          color: isValidated ? '#065f46' : isPending ? '#92400e' : '#991b1b',
-                        }}>
+                      <td className="px-4 py-3.5 text-sm text-slate-700">
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-semibold inline-block ${
+                            isValidated
+                              ? 'bg-emerald-50 text-emerald-700'
+                              : isPending
+                              ? 'bg-amber-50 text-amber-700'
+                              : 'bg-red-50 text-red-700'
+                          }`}
+                        >
                           {prop.status}
                         </span>
                       </td>
-                      <td style={styles.td}>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                      <td className="px-4 py-3.5 text-sm text-slate-700">
+                        <div className="flex gap-2">
                           {/* Voir les détails */}
                           <IconButton
                             icon={<EyeIcon size={16} />}
@@ -201,161 +224,3 @@ export default function PropertiesPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  pageHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '25px',
-    flexWrap: 'wrap',
-    gap: '15px',
-  },
-  title: {
-    margin: 0,
-    fontSize: '24px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  subtitle: {
-    margin: '5px 0 0 0',
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  refreshButton: {
-    padding: '10px 16px',
-    backgroundColor: '#ffffff',
-    color: '#334155',
-    border: '1px solid #cbd5e1',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  errorAlert: {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    marginBottom: '20px',
-    border: '1px solid #fee2e2',
-  },
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  kpiCard: {
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    border: '1px solid #e2e8f0',
-  },
-  kpiIcon: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '22px',
-    fontWeight: 'bold',
-  },
-  kpiLabel: {
-    margin: 0,
-    fontSize: '13px',
-    color: '#64748b',
-    fontWeight: '600',
-  },
-  kpiValue: {
-    margin: '4px 0 0 0',
-    fontSize: '22px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  tableCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-    padding: '20px',
-  },
-  tableTitle: {
-    margin: '0 0 20px 0',
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  tableResponsive: {
-    overflowX: 'auto',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left',
-  },
-  trHeader: {
-    borderBottom: '2px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-  },
-  th: {
-    padding: '12px 16px',
-    fontSize: '12px',
-    fontWeight: '700',
-    color: '#475569',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  tr: {
-    borderBottom: '1px solid #f1f5f9',
-  },
-  td: {
-    padding: '14px 16px',
-    fontSize: '14px',
-    color: '#334155',
-  },
-  tdSub: {
-    fontSize: '12px',
-    color: '#64748b',
-    marginTop: '2px',
-  },
-  badge: {
-    padding: '4px 10px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '600',
-    display: 'inline-block',
-  },
-  favoriteBadge: {
-    fontWeight: '600',
-    color: '#d97706',
-    backgroundColor: '#fef3c7',
-    padding: '4px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
-  },
-  loadingText: {
-    textAlign: 'center',
-    padding: '30px',
-    color: '#64748b',
-  },
-  emptyText: {
-    textAlign: 'center',
-    padding: '30px',
-    color: '#64748b',
-  },
-};

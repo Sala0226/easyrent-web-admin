@@ -61,131 +61,135 @@ export default function UsersPage() {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="max-w-7xl mx-auto">
       {notification && (
         <div
-          style={{
-            ...styles.toast,
-            backgroundColor: notification.type === 'success' ? '#22c55e' : '#ef4444',
-          }}
+          className={`fixed top-5 right-5 text-white px-5 py-3 rounded-lg shadow-lg z-50 font-semibold text-sm ${
+            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          }`}
         >
           {notification.message}
         </div>
       )}
 
       {/* En-tête de la page */}
-      <div style={styles.pageHeader}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 style={styles.title}>Gestion des Utilisateurs</h1>
-          <p style={styles.subtitle}>Gestion centralisée des utilisateurs et des accès</p>
+          <h1 className="text-2xl font-extrabold text-slate-900 m-0">Gestion des Utilisateurs</h1>
+          <p className="text-sm text-slate-500 mt-1">Gestion centralisée des utilisateurs et des accès</p>
         </div>
-        <button onClick={handleRefresh} style={styles.refreshButton}>
+        <button
+          onClick={handleRefresh}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
+        >
           <RefreshIcon size={16} /> Actualiser
         </button>
       </div>
 
-      {error && <div style={styles.errorAlert}>{error}</div>}
+      {error && (
+        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm mb-5 border border-red-200">
+          {error}
+        </div>
+      )}
 
       {/* Cartes KPI */}
-      <div style={styles.kpiGrid}>
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, background: '#e0f2fe', color: '#0284c7' }}>👥</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-sky-50 text-sky-600">
+            👥
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Total Utilisateurs</p>
-            <h2 style={styles.kpiValue}>{stats.total}</h2>
+            <p className="text-xs font-semibold text-slate-500 m-0">Total Utilisateurs</p>
+            <h2 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{stats.total}</h2>
           </div>
         </div>
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, background: '#dcfce7', color: '#16a34a' }}>🔎</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-green-50 text-green-600">
+            🔎
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Clients</p>
-            <h2 style={styles.kpiValue}>{stats.clients}</h2>
+            <p className="text-xs font-semibold text-slate-500 m-0">Clients</p>
+            <h2 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{stats.clients}</h2>
           </div>
         </div>
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, background: '#ffedd5', color: '#ea580c' }}>🏠</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-orange-50 text-orange-600">
+            🏠
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Annonceurs</p>
-            <h2 style={styles.kpiValue}>{stats.annonceurs}</h2>
+            <p className="text-xs font-semibold text-slate-500 m-0">Annonceurs</p>
+            <h2 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{stats.annonceurs}</h2>
           </div>
         </div>
-        <div style={styles.kpiCard}>
-          <div style={{ ...styles.kpiIcon, background: '#f3e8ff', color: '#9333ea' }}>🛡️</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-purple-50 text-purple-600">
+            🛡️
+          </div>
           <div>
-            <p style={styles.kpiLabel}>Administrateurs</p>
-            <h2 style={styles.kpiValue}>{stats.admins}</h2>
+            <p className="text-xs font-semibold text-slate-500 m-0">Administrateurs</p>
+            <h2 className="text-xl font-extrabold text-slate-900 mt-1 mb-0">{stats.admins}</h2>
           </div>
         </div>
       </div>
 
       {/* Tableau des utilisateurs */}
-      <div style={styles.tableCard}>
-        <h3 style={styles.tableTitle}>Liste des Utilisateurs</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Utilisateurs</h3>
 
         {loading ? (
-          <p style={styles.infoText}>Chargement des données...</p>
+          <p className="text-center py-8 text-slate-500">Chargement des données...</p>
         ) : users.length === 0 ? (
-          <p style={styles.infoText}>Aucun utilisateur trouvé.</p>
+          <p className="text-center py-8 text-slate-500">Aucun utilisateur trouvé.</p>
         ) : (
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
               <thead>
-                <tr style={styles.trHead}>
-                  <th style={styles.th}>Nom</th>
-                  <th style={styles.th}>Email</th>
-                  <th style={styles.th}>Rôle</th>
-                  <th style={styles.th}>Statut</th>
-                  <th style={styles.th}>Actions</th>
+                <tr className="bg-slate-50 border-b-2 border-slate-200">
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Nom</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Email</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Rôle</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user, index) => (
                   <tr
                     key={user.id}
-                    style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8fafc' }}
+                    className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}
                   >
-                    <td style={styles.td}>
-                      <div style={styles.userName}>
-                        <span style={styles.avatar}>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">
+                      <div className="flex items-center gap-2.5 font-semibold">
+                        <span className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
                           {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                         </span>
                         {user.name || 'Sans nom'}
                       </div>
                     </td>
-                    <td style={styles.td}>{user.email}</td>
-                    <td style={styles.td}>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">{user.email}</td>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">
                       <span
-                        style={{
-                          ...styles.badge,
-                          backgroundColor:
-                            user.role === 'ADMIN'
-                              ? '#f3e8ff'
-                              : user.role === 'ANNONCEUR'
-                              ? '#ffedd5'
-                              : '#e0f2fe',
-                          color:
-                            user.role === 'ADMIN'
-                              ? '#7e22ce'
-                              : user.role === 'ANNONCEUR'
-                              ? '#c2410c'
-                              : '#0369a1',
-                        }}
+                        className={`px-2.5 py-1 rounded-full text-xs font-bold inline-block ${
+                          user.role === 'ADMIN'
+                            ? 'bg-purple-50 text-purple-700'
+                            : user.role === 'ANNONCEUR'
+                            ? 'bg-orange-50 text-orange-700'
+                            : 'bg-sky-50 text-sky-700'
+                        }`}
                       >
                         {user.role}
                       </span>
                     </td>
-                    <td style={styles.td}>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">
                       <span
-                        style={{
-                          ...styles.badge,
-                          backgroundColor: user.isActive ? '#dcfce7' : '#fee2e2',
-                          color: user.isActive ? '#15803d' : '#b91c1c',
-                        }}
+                        className={`px-2.5 py-1 rounded-full text-xs font-bold inline-block ${
+                          user.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                        }`}
                       >
                         {user.isActive ? 'Actif' : 'Désactivé'}
                       </span>
                     </td>
-                    <td style={styles.td}>
+                    <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">
                       <IconButton
                         icon={<PowerIcon />}
                         label={user.isActive ? 'Désactiver le compte' : 'Activer le compte'}
@@ -211,169 +215,3 @@ export default function UsersPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  toast: {
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    color: '#ffffff',
-    padding: '12px 20px',
-    borderRadius: '8px',
-    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-    zIndex: 1000,
-    fontWeight: '600',
-    fontSize: '14px',
-  },
-  pageHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '25px',
-    flexWrap: 'wrap',
-    gap: '15px',
-  },
-  title: {
-    margin: 0,
-    fontSize: '24px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  subtitle: {
-    margin: '5px 0 0 0',
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  refreshButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 16px',
-    backgroundColor: '#ffffff',
-    color: '#334155',
-    border: '1px solid #cbd5e1',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-  },
-  errorAlert: {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    marginBottom: '20px',
-    border: '1px solid #fee2e2',
-  },
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  kpiCard: {
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    border: '1px solid #e2e8f0',
-  },
-  kpiIcon: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '22px',
-  },
-  kpiLabel: {
-    margin: 0,
-    fontSize: '13px',
-    color: '#64748b',
-    fontWeight: '600',
-  },
-  kpiValue: {
-    margin: '4px 0 0 0',
-    fontSize: '22px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  tableCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    border: '1px solid #e2e8f0',
-    padding: '20px',
-  },
-  tableTitle: {
-    margin: '0 0 20px 0',
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  tableWrapper: {
-    overflowX: 'auto',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left',
-  },
-  trHead: {
-    backgroundColor: '#f8fafc',
-    borderBottom: '2px solid #e2e8f0',
-  },
-  th: {
-    padding: '12px 16px',
-    fontSize: '12px',
-    fontWeight: '700',
-    color: '#475569',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  td: {
-    padding: '14px 16px',
-    fontSize: '14px',
-    color: '#334155',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  userName: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontWeight: '600',
-  },
-  avatar: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '13px',
-    fontWeight: '700',
-  },
-  badge: {
-    padding: '4px 10px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '700',
-    display: 'inline-block',
-  },
-  infoText: {
-    textAlign: 'center',
-    padding: '30px',
-    color: '#64748b',
-  },
-};

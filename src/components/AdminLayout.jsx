@@ -19,266 +19,94 @@ export default function AdminLayout() {
 
   const handleNavClick = (path) => {
     navigate(path);
-    setIsMobileMenuOpen(false); // Ferme le menu sur mobile après un clic
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    <div style={styles.layoutContainer}>
-      {/* Injection des media queries CSS pour gérer le responsive proprement */}
-      <style>{`
-        @media (max-width: 768px) {
-          .admin-sidebar {
-            transform: ${isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)'} !important;
-          }
-          .admin-main-content {
-            margin-left: 0 !important;
-          }
-          .burger-btn {
-            display: block !important;
-          }
-          .admin-overlay {
-            display: ${isMobileMenuOpen ? 'block' : 'none'} !important;
-          }
-        }
-      `}</style>
-
+    <div className="flex min-h-screen bg-slate-100 font-sans relative">
       {/* Overlay sombre pour mobile */}
-      <div 
-        className="admin-overlay"
-        style={styles.overlay} 
-        onClick={() => setIsMobileMenuOpen(false)} 
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity ${
+          isMobileMenuOpen ? 'block md:hidden' : 'hidden'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Sidebar latérale */}
-      <aside className="admin-sidebar" style={styles.sidebar}>
-        <div style={styles.sidebarHeader}>
-          <img src={logoImage} alt="Logo" style={styles.logo} />
-          <span style={styles.brandName}>EASYRENT</span>
+      <aside
+        className={`fixed top-0 bottom-0 left-0 z-50 w-[260px] bg-slate-900 text-white flex flex-col shadow-lg transition-transform duration-300 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div className="p-6 flex items-center gap-3 border-b border-slate-800">
+          <img src={logoImage} alt="Logo" className="w-9 h-9 rounded-lg object-cover" />
+          <span className="text-lg font-extrabold tracking-wide text-white">EASYRENT</span>
         </div>
 
-        <nav style={styles.nav}>
+        <nav className="p-5 flex flex-col gap-1.5 flex-1">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                style={{
-                  ...styles.navItem,
-                  backgroundColor: isActive ? 'rgba(234, 88, 12, 0.15)' : 'transparent',
-                  color: isActive ? '#f97316' : '#94a3b8',
-                  borderLeft: isActive ? '4px solid #f97316' : '4px solid transparent',
-                }}
+                className={`flex items-center gap-3.5 px-5 py-3 bg-none border-none text-sm font-semibold cursor-pointer text-left transition-all ${
+                  isActive
+                    ? 'bg-orange-500/15 text-orange-500 border-l-4 border-orange-500'
+                    : 'text-slate-400 border-l-4 border-transparent hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
               >
-                <span style={styles.navIcon}>{item.icon}</span>
+                <span className="text-lg">{item.icon}</span>
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        <div style={styles.sidebarFooter}>
-          <button onClick={logout} style={styles.logoutButton}>
+        <div className="p-5 border-t border-slate-800">
+          <button
+            onClick={logout}
+            className="w-full px-2.5 py-2.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg font-semibold cursor-pointer hover:bg-red-500/20 transition-colors"
+          >
             Déconnexion
           </button>
         </div>
       </aside>
 
       {/* Contenu principal */}
-      <div className="admin-main-content" style={styles.mainContent}>
+      <div className="flex-1 md:ml-[260px] flex flex-col w-full">
         {/* Header supérieur */}
-        <header style={styles.header}>
-          <div style={styles.headerLeft}>
-            {/* Bouton Burger (masqué sur web, visible sur mobile) */}
-            <button 
-              className="burger-btn"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-              style={styles.burgerButton}
+        <header className="h-[70px] bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            {/* Bouton Burger (visible sur mobile) */}
+            <button
+              className="md:hidden bg-none border-none text-2xl cursor-pointer text-slate-900 pr-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Menu"
             >
               ☰
             </button>
-            <h2 style={styles.headerTitle}>
+            <h2 className="text-xl font-bold text-slate-900 m-0">
               {menuItems.find(m => m.path === location.pathname)?.label || 'Administration'}
             </h2>
           </div>
 
-          <div style={styles.adminProfile}>
-            <div style={styles.avatarMini}>A</div>
-            <div>
-              <p style={styles.adminName}>Administrateur</p>
-              <p style={styles.adminRole}>Super Admin</p>
+          <div className="flex items-center gap-3">
+            <div className="w-9.5 h-9.5 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
+              A
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-bold text-slate-900 m-0">Administrateur</p>
+              <p className="text-xs text-slate-500 m-0">Super Admin</p>
             </div>
           </div>
         </header>
 
         {/* Zone dynamique des pages */}
-        <main style={styles.contentBody}>
+        <main className="p-4 sm:p-8 flex-1">
           <Outlet />
         </main>
       </div>
     </div>
   );
 }
-
-const styles = {
-  layoutContainer: {
-    display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: '#f1f5f9',
-    fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    position: 'relative',
-  },
-  overlay: {
-    display: 'none',
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 99,
-  },
-  sidebar: {
-    width: '260px',
-    backgroundColor: '#0f172a',
-    color: '#ffffff',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    boxShadow: '4px 0 10px rgba(0,0,0,0.05)',
-    zIndex: 100,
-    transition: 'transform 0.3s ease-in-out',
-    transform: 'translateX(0)', // Visible par défaut sur Web
-  },
-  sidebarHeader: {
-    padding: '24px 20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    borderBottom: '1px solid #1e293b',
-  },
-  logo: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '8px',
-    objectFit: 'cover',
-  },
-  brandName: {
-    fontSize: '18px',
-    fontWeight: '800',
-    letterSpacing: '0.5px',
-    color: '#ffffff',
-  },
-  nav: {
-    padding: '20px 0',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-    flex: 1,
-  },
-  navItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '14px',
-    padding: '12px 20px',
-    background: 'none',
-    border: 'none',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'all 0.2s ease',
-  },
-  navIcon: {
-    fontSize: '18px',
-  },
-  sidebarFooter: {
-    padding: '20px',
-    borderTop: '1px solid #1e293b',
-  },
-  logoutButton: {
-    width: '100%',
-    padding: '10px',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    color: '#ef4444',
-    border: '1px solid rgba(239, 68, 68, 0.2)',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background 0.2s',
-  },
-  mainContent: {
-    flex: 1,
-    marginLeft: '260px', // Décale le contenu sur Web pour laisser la place à la sidebar
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-  },
-  header: {
-    height: '70px',
-    backgroundColor: '#ffffff',
-    borderBottom: '1px solid #e2e8f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 30px',
-    position: 'sticky',
-    top: 0,
-    zIndex: 9,
-  },
-  headerLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  burgerButton: {
-    display: 'none', // Masqué par défaut sur Web, affiché via la media query sur mobile
-    background: 'none',
-    border: 'none',
-    fontSize: '24px',
-    cursor: 'pointer',
-    color: '#0f172a',
-    padding: '0 8px 0 0',
-  },
-  headerTitle: {
-    margin: 0,
-    fontSize: '20px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  adminProfile: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  avatarMini: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '50%',
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: '700',
-  },
-  adminName: {
-    margin: 0,
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  adminRole: {
-    margin: 0,
-    fontSize: '12px',
-    color: '#64748b',
-  },
-  contentBody: {
-    padding: '30px',
-    flex: 1,
-  },
-};

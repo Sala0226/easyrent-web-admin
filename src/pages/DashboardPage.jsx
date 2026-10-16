@@ -135,8 +135,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div style={styles.centerMessage}>
-        <div style={styles.loadingSpinner}></div>
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-500">
+        <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-5"></div>
         <p>Chargement du tableau de bord...</p>
       </div>
     );
@@ -144,11 +144,14 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div style={styles.centerMessage}>
-        <div style={styles.errorCard}>
-          <span style={styles.errorIcon}>⚠️</span>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center max-w-[400px]">
+          <span className="text-5xl block mb-4">⚠️</span>
           <p>{error}</p>
-          <button onClick={fetchDashboardStats} style={styles.retryButton}>
+          <button
+            onClick={fetchDashboardStats}
+            className="mt-5 px-5 py-2.5 bg-blue-500 text-white border-none rounded-lg font-semibold cursor-pointer hover:bg-blue-600 transition-colors"
+          >
             Réessayer
           </button>
         </div>
@@ -157,308 +160,137 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="font-sans">
       {/* Header */}
-      <div style={styles.header}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 style={styles.title}>Tableau de Bord</h1>
-          <p style={styles.subtitle}>Vue d'ensemble de la plateforme EasyRent</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 m-0">Tableau de Bord</h1>
+          <p className="text-sm text-slate-500 mt-1">Vue d'ensemble de la plateforme EasyRent</p>
         </div>
-        <div style={styles.headerActions}>
-          <button onClick={fetchDashboardStats} style={styles.refreshButton}>
+        <div className="flex gap-3">
+          <button
+            onClick={fetchDashboardStats}
+            className="px-5 py-3 bg-white text-slate-700 border border-slate-300 rounded-xl font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-all"
+          >
             <RefreshIcon size={16} /> Actualiser
           </button>
         </div>
       </div>
 
       {/* Cartes statistiques principales */}
-      <div style={styles.mainStatsGrid}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
         {/* Carte Utilisateurs */}
-        <div style={styles.compactStatCard}>
-          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>👥</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-blue-50 text-blue-500">
+            👥
+          </div>
           <div>
-            <p style={styles.compactLabel}>Utilisateurs</p>
-            <h3 style={styles.compactValue}>{stats.users.total}</h3>
-            <p style={styles.compactSubtext}>Actifs: {stats.users.active} | Annonceurs: {stats.users.advertisers}</p>
+            <p className="text-xs font-semibold text-slate-500 m-0">Utilisateurs</p>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1 mb-0">{stats.users.total}</h3>
+            <p className="text-xs text-slate-500 mt-1 mb-0">
+              Actifs: {stats.users.active} | Annonceurs: {stats.users.advertisers}
+            </p>
           </div>
         </div>
 
         {/* Carte Propriétés */}
-        <div style={styles.compactStatCard}>
-          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>🏠</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-amber-50 text-amber-500">
+            🏠
+          </div>
           <div>
-            <p style={styles.compactLabel}>Propriétés</p>
-            <h3 style={styles.compactValue}>{stats.properties.total}</h3>
-            <p style={styles.compactSubtext}>Disponibles: {stats.properties.available} | Louées: {stats.properties.rented}</p>
+            <p className="text-xs font-semibold text-slate-500 m-0">Propriétés</p>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1 mb-0">{stats.properties.total}</h3>
+            <p className="text-xs text-slate-500 mt-1 mb-0">
+              Disponibles: {stats.properties.available} | Louées: {stats.properties.rented}
+            </p>
           </div>
         </div>
 
         {/* Carte Visites */}
-        <div style={styles.compactStatCard}>
-          <div style={{ ...styles.compactIcon, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>📅</div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-emerald-50 text-emerald-500">
+            📅
+          </div>
           <div>
-            <p style={styles.compactLabel}>Visites</p>
-            <h3 style={styles.compactValue}>{stats.visits.total}</h3>
-            <p style={styles.compactSubtext}>En attente: {stats.visits.pending} | Acceptées: {stats.visits.accepted} | Refusées: {stats.visits.refused}</p>
+            <p className="text-xs font-semibold text-slate-500 m-0">Visites</p>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1 mb-0">{stats.visits.total}</h3>
+            <p className="text-xs text-slate-500 mt-1 mb-0">
+              En attente: {stats.visits.pending} | Acceptées: {stats.visits.accepted} | Refusées: {stats.visits.refused}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Section Actions Rapides */}
-      <div style={styles.quickActionsSection}>
-        <h3 style={styles.sectionTitle}>Actions Rapides</h3>
-        <div style={styles.actionsGrid}>
-          <button style={styles.actionCard} onClick={() => window.location.href = '/users'}>
-            <span style={styles.actionIcon}>👥</span>
+      <div className="mb-8">
+        <h3 className="text-xl font-bold text-slate-900 mb-5">Actions Rapides</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button
+            className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
+            onClick={() => window.location.href = '/users'}
+          >
+            <span className="text-3xl">👥</span>
             <div>
-              <p style={styles.actionTitle}>Gérer les Utilisateurs</p>
-              <p style={styles.actionSubtitle}>Activer/désactiver des comptes</p>
+              <p className="text-sm font-bold text-slate-900 m-0">Gérer les Utilisateurs</p>
+              <p className="text-xs text-slate-500 mt-1 mb-0">Activer/désactiver des comptes</p>
             </div>
           </button>
-          <button style={styles.actionCard} onClick={() => window.location.href = '/properties'}>
-            <span style={styles.actionIcon}>🏠</span>
+          <button
+            className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
+            onClick={() => window.location.href = '/properties'}
+          >
+            <span className="text-3xl">🏠</span>
             <div>
-              <p style={styles.actionTitle}>Voir les Propriétés</p>
-              <p style={styles.actionSubtitle}>Gérer les annonces</p>
+              <p className="text-sm font-bold text-slate-900 m-0">Voir les Propriétés</p>
+              <p className="text-xs text-slate-500 mt-1 mb-0">Gérer les annonces</p>
             </div>
           </button>
-          <button style={styles.actionCard} onClick={() => window.location.href = '/visits'}>
-            <span style={styles.actionIcon}>📅</span>
+          <button
+            className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
+            onClick={() => window.location.href = '/visits'}
+          >
+            <span className="text-3xl">📅</span>
             <div>
-              <p style={styles.actionTitle}>Demandes de Visite</p>
-              <p style={styles.actionSubtitle}>Valider/refuser les visites</p>
+              <p className="text-sm font-bold text-slate-900 m-0">Demandes de Visite</p>
+              <p className="text-xs text-slate-500 mt-1 mb-0">Valider/refuser les visites</p>
             </div>
           </button>
         </div>
       </div>
 
       {/* Statistiques additionnelles */}
-      <div style={styles.additionalStats}>
-        <div style={styles.infoCard}>
-          <div style={styles.infoIcon}>📊</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div className="text-2xl">📊</div>
           <div>
-            <p style={styles.infoLabel}>Taux d'activation</p>
-            <p style={styles.infoValue}>
+            <p className="text-xs font-semibold text-slate-500 m-0">Taux d'activation</p>
+            <p className="text-lg font-bold text-slate-900 mt-1 mb-0">
               {stats.users.total > 0
                 ? Math.round((stats.users.active / stats.users.total) * 100)
                 : 0}%
             </p>
           </div>
         </div>
-        <div style={styles.infoCard}>
-          <div style={styles.infoIcon}>🎯</div>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div className="text-2xl">🎯</div>
           <div>
-            <p style={styles.infoLabel}>Taux de disponibilité</p>
-            <p style={styles.infoValue}>
+            <p className="text-xs font-semibold text-slate-500 m-0">Taux de disponibilité</p>
+            <p className="text-lg font-bold text-slate-900 mt-1 mb-0">
               {stats.properties.total > 0
                 ? Math.round((stats.properties.available / stats.properties.total) * 100)
                 : 0}%
             </p>
           </div>
         </div>
-        <div style={styles.infoCard}>
-          <div style={styles.infoIcon}>⚡</div>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div className="text-2xl">⚡</div>
           <div>
-            <p style={styles.infoLabel}>Visites en attente</p>
-            <p style={styles.infoValue}>{stats.visits.pending}</p>
+            <p className="text-xs font-semibold text-slate-500 m-0">Visites en attente</p>
+            <p className="text-lg font-bold text-slate-900 mt-1 mb-0">{stats.visits.pending}</p>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: '0',
-    fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-  },
-  centerMessage: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '400px',
-    color: '#64748b',
-  },
-  loadingSpinner: {
-    width: '50px',
-    height: '50px',
-    border: '4px solid #e2e8f0',
-    borderTop: '4px solid #3b82f6',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-    marginBottom: '20px',
-  },
-  errorCard: {
-    backgroundColor: '#fef2f2',
-    border: '1px solid #fee2e2',
-    borderRadius: '12px',
-    padding: '30px',
-    textAlign: 'center',
-    maxWidth: '400px',
-  },
-  errorIcon: {
-    fontSize: '48px',
-    display: 'block',
-    marginBottom: '15px',
-  },
-  retryButton: {
-    marginTop: '20px',
-    padding: '10px 20px',
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '30px',
-    flexWrap: 'wrap',
-    gap: '15px',
-  },
-  title: {
-    margin: 0,
-    fontSize: '28px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  subtitle: {
-    margin: '5px 0 0 0',
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  headerActions: {
-    display: 'flex',
-    gap: '12px',
-  },
-  refreshButton: {
-    padding: '12px 20px',
-    backgroundColor: '#ffffff',
-    color: '#334155',
-    border: '1px solid #cbd5e1',
-    borderRadius: '10px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    transition: 'all 0.2s',
-  },
-  mainStatsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  compactStatCard: {
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    border: '1px solid #e2e8f0',
-  },
-  compactIcon: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '26px',
-    flexShrink: 0,
-  },
-  compactLabel: {
-    margin: 0,
-    fontSize: '13px',
-    color: '#64748b',
-    fontWeight: '600',
-  },
-  compactValue: {
-    margin: '4px 0 0 0',
-    fontSize: '28px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  compactSubtext: {
-    margin: '4px 0 0 0',
-    fontSize: '12px',
-    color: '#64748b',
-  },
-  quickActionsSection: {
-    marginBottom: '30px',
-  },
-  sectionTitle: {
-    margin: '0 0 20px 0',
-    fontSize: '20px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  actionsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '16px',
-  },
-  actionCard: {
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '12px',
-    padding: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    textAlign: 'left',
-  },
-  actionIcon: {
-    fontSize: '32px',
-  },
-  actionTitle: {
-    margin: 0,
-    fontSize: '15px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  actionSubtitle: {
-    margin: '4px 0 0 0',
-    fontSize: '13px',
-    color: '#64748b',
-  },
-  additionalStats: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '16px',
-  },
-  infoCard: {
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '12px',
-    padding: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-  },
-  infoIcon: {
-    fontSize: '28px',
-  },
-  infoLabel: {
-    margin: 0,
-    fontSize: '13px',
-    color: '#64748b',
-    fontWeight: '600',
-  },
-  infoValue: {
-    margin: '4px 0 0 0',
-    fontSize: '20px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-};

@@ -8,7 +8,7 @@ export default function PropertyDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
-  
+
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -45,33 +45,33 @@ export default function PropertyDetailPage() {
     const isSuspended = status === 'SUSPENDUE' || status === 'SUSPENDED';
 
     let label = 'EN_ATTENTE';
-    let bgColor = '#fef3c7';
-    let color = '#92400e';
+    let bgColor = 'bg-amber-50';
+    let textColor = 'text-amber-700';
 
     if (isValidated) {
       label = 'VALIDÉE';
-      bgColor = '#d1fae5';
-      color = '#065f46';
+      bgColor = 'bg-emerald-50';
+      textColor = 'text-emerald-700';
     } else if (isSuspended) {
       label = 'SUSPENDUE';
-      bgColor = '#fee2e2';
-      color = '#991b1b';
+      bgColor = 'bg-red-50';
+      textColor = 'text-red-700';
     } else if (status === 'REFUSEE' || status === 'REFUSED') {
       label = 'REFUSÉE';
-      bgColor = '#fee2e2';
-      color = '#991b1b';
+      bgColor = 'bg-red-50';
+      textColor = 'text-red-700';
     }
 
     return (
-      <span style={{ ...styles.statusBadge, backgroundColor: bgColor, color: color }}>
+      <span className={`px-3 py-1 rounded-full text-xs font-bold ${bgColor} ${textColor}`}>
         {label}
       </span>
     );
   };
 
-  if (loading) return <div style={styles.centerText}>Chargement des détails...</div>;
-  if (error) return <div style={styles.errorAlert}>{error}</div>;
-  if (!property) return <div style={styles.centerText}>Propriété introuvable.</div>;
+  if (loading) return <div className="text-center py-10 text-slate-500">Chargement des détails...</div>;
+  if (error) return <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm mb-5 border border-red-200">{error}</div>;
+  if (!property) return <div className="text-center py-10 text-slate-500">Propriété introuvable.</div>;
 
   const isSuspended = property.status === 'SUSPENDUE' || property.status === 'SUSPENDED';
 
@@ -118,30 +118,39 @@ export default function PropertyDetailPage() {
   const secondaryImages = allImages.length > 1 ? allImages.slice(1) : [];
 
   return (
-    <div style={styles.container}>
+    <div className="max-w-7xl mx-auto pb-10">
       {/* En-tête avec bouton retour et bouton de suspension */}
-      <div style={styles.topBar}>
-        <button onClick={() => navigate(-1)} style={styles.backButton}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
+        >
           <ArrowLeftIcon size={16} /> Retour
         </button>
 
-        <button 
-          onClick={() => handleUpdateStatus(isSuspended ? 'VALIDEE' : 'SUSPENDUE')} 
-          style={isSuspended ? styles.activateBtn : styles.suspendBtn}
+        <button
+          onClick={() => handleUpdateStatus(isSuspended ? 'VALIDEE' : 'SUSPENDUE')}
+          className={`inline-flex items-center gap-2 px-4.5 py-2.5 border-none rounded-lg font-semibold cursor-pointer ${
+            isSuspended
+              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25 hover:bg-emerald-600 transition-colors'
+              : 'bg-red-500 text-white shadow-md shadow-red-500/25 hover:bg-red-600 transition-colors'
+          }`}
         >
           <PowerIcon size={16} /> {isSuspended ? 'Activer la propriété' : 'Suspendre la propriété'}
         </button>
       </div>
 
       {/* Titre & Statut */}
-      <div style={styles.headerCard}>
-        <div>
-          <span style={styles.typeBadge}>{property.type}</span>
-          <h1 style={styles.title}>{property.title}</h1>
-          <p style={styles.location}>{property.address}, {property.city}</p>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-start gap-5 mb-5">
+        <div className="flex-1">
+          <span className="bg-blue-50 text-blue-500 px-2.5 py-1 rounded-full text-xs font-bold uppercase">
+            {property.type}
+          </span>
+          <h1 className="text-2xl font-extrabold text-slate-900 mt-2 mb-1">{property.title}</h1>
+          <p className="text-sm text-slate-500 m-0">{property.address}, {property.city}</p>
         </div>
-        <div style={styles.headerRight}>
-          <span style={styles.price}>
+        <div className="flex flex-col items-end gap-2">
+          <span className="text-xl font-extrabold text-slate-900">
             {property.price ? `${property.price.toLocaleString()} FCFA` : 'N/C'}
           </span>
           {getStatusBadge(property.status)}
@@ -149,70 +158,74 @@ export default function PropertyDetailPage() {
       </div>
 
       {/* Informations générales & Description */}
-      <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Informations générales</h3>
-        <div style={styles.specsGrid}>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Type</span>
-            <strong style={styles.specValue}>{property.type || 'N/A'}</strong>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 className="text-lg font-bold text-slate-900 mb-4">Informations générales</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Type</span>
+            <strong className="text-sm text-slate-900">{property.type || 'N/A'}</strong>
           </div>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Prix</span>
-            <strong style={styles.specValue}>
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Prix</span>
+            <strong className="text-sm text-slate-900">
               {property.price ? `${property.price.toLocaleString()} FCFA` : 'N/A'}
             </strong>
           </div>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Surface</span>
-            <strong style={styles.specValue}>
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Surface</span>
+            <strong className="text-sm text-slate-900">
               {property.surface ? `${property.surface} m²` : 'N/A'}
             </strong>
           </div>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Chambres</span>
-            <strong style={styles.specValue}>{property.rooms || property.chambres || 'N/A'}</strong>
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Chambres</span>
+            <strong className="text-sm text-slate-900">{property.rooms || property.chambres || 'N/A'}</strong>
           </div>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Salles de bain</span>
-            <strong style={styles.specValue}>{property.bathrooms || property.sallesDeBain || 'N/A'}</strong>
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Salles de bain</span>
+            <strong className="text-sm text-slate-900">{property.bathrooms || property.sallesDeBain || 'N/A'}</strong>
           </div>
-          <div style={styles.specItem}>
-            <span style={styles.specLabel}>Favoris</span>
-            <strong style={styles.specValue}>
+          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 flex flex-col gap-1">
+            <span className="text-xs text-slate-500 font-semibold">Favoris</span>
+            <strong className="text-sm text-slate-900">
               ⭐ {property._count?.favorites || property.favorites?.length || 0}
             </strong>
           </div>
         </div>
 
-        <h3 style={{ ...styles.cardTitle, marginTop: '25px' }}>Description</h3>
-        <p style={styles.description}>
+        <h3 className="text-lg font-bold text-slate-900 mb-4 mt-6">Description</h3>
+        <p className="text-sm text-slate-600 leading-relaxed m-0">
           {property.description || 'Aucune description disponible pour ce bien.'}
         </p>
 
         {/* Section Images de la propriété */}
-        <h3 style={{ ...styles.cardTitle, marginTop: '30px' }}>Images de la propriété</h3>
-        <div style={styles.imagesContainer}>
+        <h3 className="text-lg font-bold text-slate-900 mb-4 mt-8">Images de la propriété</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4">
           {/* Image principale */}
-          <div style={styles.mainImageWrapper}>
+          <div className="relative h-64 rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
             {mainImage ? (
-              <img src={mainImage} alt="Bien principal" style={styles.imageCover} />
+              <img src={mainImage} alt="Bien principal" className="w-full h-full object-cover" />
             ) : (
-              <div style={styles.noImagePlaceholder}>Aucune image principale</div>
+              <div className="flex items-center justify-center h-full text-slate-500 text-sm">
+                Aucune image principale
+              </div>
             )}
-            <span style={styles.imageCaption}>Image principale</span>
+            <span className="absolute bottom-2 left-2 bg-slate-900/75 text-white px-2 py-1 rounded-md text-xs font-semibold">
+              Image principale
+            </span>
           </div>
 
           {/* Photos secondaires */}
-          <div style={styles.secondaryImagesGrid}>
+          <div className="grid grid-cols-2 gap-3 h-64">
             {secondaryImages.length > 0 ? (
               secondaryImages.map((imgUrl, index) => (
-                <div key={index} style={styles.secondaryImageWrapper}>
-                  <img src={imgUrl} alt={`Photo ${index + 1}`} style={styles.imageCover} />
+                <div key={index} className="h-[124px] rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                  <img src={imgUrl} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
                 </div>
               ))
             ) : (
-              <div style={styles.noSecondaryImages}>
-                <p style={{ margin: 0, color: '#64748b', fontSize: '13px' }}>Aucune photo secondaire</p>
+              <div className="col-span-2 flex items-center justify-center h-full border border-dashed border-slate-300 rounded-lg bg-slate-50">
+                <p className="m-0 text-slate-500 text-xs">Aucune photo secondaire</p>
               </div>
             )}
           </div>
@@ -221,223 +234,3 @@ export default function PropertyDetailPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    paddingBottom: '40px',
-  },
-  topBar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-  },
-  backButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '8px 16px',
-    backgroundColor: '#ffffff',
-    border: '1px solid #cbd5e1',
-    borderRadius: '8px',
-    color: '#334155',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-  },
-  suspendBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 18px',
-    backgroundColor: '#ef4444',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(239, 68, 68, 0.25)',
-  },
-  activateBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 18px',
-    backgroundColor: '#10b981',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
-  },
-  headerCard: {
-    backgroundColor: '#ffffff',
-    padding: '24px',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    border: '1px solid #e2e8f0',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '20px',
-  },
-  typeBadge: {
-    backgroundColor: '#eff6ff',
-    color: '#3b82f6',
-    padding: '4px 10px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  title: {
-    margin: '8px 0 4px 0',
-    fontSize: '24px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  location: {
-    margin: 0,
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  headerRight: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: '8px',
-  },
-  price: {
-    fontSize: '20px',
-    fontWeight: '800',
-    color: '#0f172a',
-  },
-  statusBadge: {
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '700',
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    padding: '24px',
-    borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    border: '1px solid #e2e8f0',
-  },
-  cardTitle: {
-    margin: '0 0 16px 0',
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  specsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-    gap: '15px',
-  },
-  specItem: {
-    backgroundColor: '#f8fafc',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  specLabel: {
-    fontSize: '12px',
-    color: '#64748b',
-    fontWeight: '600',
-  },
-  specValue: {
-    fontSize: '15px',
-    color: '#0f172a',
-  },
-  description: {
-    fontSize: '14px',
-    color: '#475569',
-    lineHeight: '1.6',
-    margin: 0,
-  },
-  imagesContainer: {
-    display: 'grid',
-    gridTemplateColumns: '1.2fr 1fr',
-    gap: '20px',
-    marginTop: '15px',
-  },
-  mainImageWrapper: {
-    position: 'relative',
-    height: '260px',
-    borderRadius: '10px',
-    overflow: 'hidden',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-  },
-  secondaryImagesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    height: '260px',
-  },
-  secondaryImageWrapper: {
-    height: '124px',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-  },
-  imageCover: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  imageCaption: {
-    position: 'absolute',
-    bottom: '8px',
-    left: '8px',
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
-    color: '#ffffff',
-    padding: '3px 8px',
-    borderRadius: '6px',
-    fontSize: '11px',
-    fontWeight: '600',
-  },
-  noImagePlaceholder: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    color: '#64748b',
-    fontSize: '13px',
-  },
-  noSecondaryImages: {
-    gridColumn: 'span 2',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    border: '1px dashed #cbd5e1',
-    borderRadius: '8px',
-    backgroundColor: '#f8fafc',
-  },
-  centerText: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#64748b',
-  },
-  errorAlert: {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    marginBottom: '20px',
-    border: '1px solid #fee2e2',
-  },
-};

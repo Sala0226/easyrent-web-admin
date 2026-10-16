@@ -57,44 +57,52 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={loginStyles.container}>
-      <div style={loginStyles.card}>
-        <div style={loginStyles.header}>
-          <img src={logoImage} alt="EasyRent Logo" style={loginStyles.logo} />
-          <h1 style={loginStyles.title}>EASYRENT</h1>
-          <p style={loginStyles.subtitle}>Administration de la plateforme</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-slate-900 font-sans p-5">
+      <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-[420px] border border-white/10">
+        <div className="text-center mb-6">
+          <img
+            src={logoImage}
+            alt="EasyRent Logo"
+            className="w-20 h-20 rounded-2xl object-cover mb-4 mx-auto shadow-lg shadow-blue-600/30"
+          />
+          <h1 className="text-2xl font-extrabold text-slate-900 m-0 tracking-wide">EASYRENT</h1>
+          <p className="text-xs text-slate-500 mt-1.5 font-medium">Administration de la plateforme</p>
         </div>
 
-        {error && <div style={loginStyles.errorAlert}>{error}</div>}
+        {error && (
+          <div className="bg-red-50 text-red-600 px-4 py-2.5 rounded-lg text-xs mb-5 border border-red-200 text-center font-medium">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} style={loginStyles.form}>
-          <div style={loginStyles.inputGroup}>
-            <label style={loginStyles.label}>Adresse Email</label>
-            <input 
-              type="email" 
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="mb-4.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Adresse Email</label>
+            <input
+              type="email"
               placeholder="admin@easyrent.com"
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-              style={loginStyles.input}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3.5 py-3 text-sm border border-slate-300 rounded-lg outline-none transition-all bg-slate-50 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
 
-          <div style={loginStyles.inputGroup}>
-            <label style={loginStyles.label}>Mot de passe</label>
-            <div style={loginStyles.passwordContainer}>
+          <div className="mb-4.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Mot de passe</label>
+            <div className="relative flex items-center">
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={loginStyles.inputWithIcon}
+                className="w-full px-3.5 py-3 pr-11 text-sm border border-slate-300 rounded-lg outline-none transition-all bg-slate-50 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={loginStyles.passwordToggle}
+                className="absolute right-3 bg-none border-none cursor-pointer p-0 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors"
                 aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
               >
                 <EyeIcon open={showPassword} />
@@ -102,14 +110,12 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            style={{
-              ...loginStyles.button,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
+            className={`w-full py-3 text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-orange-600 border-none rounded-lg shadow-lg shadow-orange-600/40 transition-all mt-2.5 tracking-wide ${
+              loading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-orange-600/50 active:scale-[0.98]'
+            }`}
           >
             {loading ? 'Connexion en cours...' : 'Se connecter'}
           </button>
@@ -157,142 +163,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
-// --- Styles CSS en objets ---
-const loginStyles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'radial-gradient(circle at center, #1e40af 0%, #0f172a 100%)',
-    fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    padding: '20px',
-  },
-  card: {
-    background: '#ffffff',
-    padding: '40px 35px',
-    borderRadius: '16px',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
-    width: '100%',
-    maxWidth: '420px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '25px',
-  },
-  logo: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '18px',
-    objectFit: 'cover',
-    marginBottom: '15px',
-    boxShadow: '0 8px 20px rgba(29, 78, 216, 0.3)',
-  },
-  title: {
-    margin: '0',
-    fontSize: '24px',
-    fontWeight: '800',
-    color: '#0f172a',
-    letterSpacing: '0.5px',
-  },
-  subtitle: {
-    margin: '6px 0 0 0',
-    fontSize: '13px',
-    color: '#64748b',
-    fontWeight: '500',
-  },
-  errorAlert: {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '10px 15px',
-    borderRadius: '8px',
-    fontSize: '13px',
-    marginBottom: '20px',
-    border: '1px solid #fee2e2',
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  inputGroup: {
-    marginBottom: '18px',
-  },
-  label: {
-    display: 'block',
-    fontSize: '13px',
-    fontWeight: '600',
-    color: '#334155',
-    marginBottom: '6px',
-  },
-  input: {
-    width: '100%',
-    padding: '12px 14px',
-    fontSize: '14px',
-    border: '1px solid #cbd5e1',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'all 0.2s ease',
-    backgroundColor: '#f8fafc',
-    boxSizing: 'border-box',
-    color: '#0f172a',
-  },
-  passwordContainer: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  inputWithIcon: {
-    width: '100%',
-    padding: '12px 45px 12px 14px',
-    fontSize: '14px',
-    border: '1px solid #cbd5e1',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'all 0.2s ease',
-    backgroundColor: '#f8fafc',
-    boxSizing: 'border-box',
-    color: '#0f172a',
-  },
-  passwordToggle: {
-    position: 'absolute',
-    right: '12px',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    padding: '0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#64748b',
-  },
-  button: {
-    width: '100%',
-    padding: '13px',
-    fontSize: '15px',
-    fontWeight: '700',
-    color: '#ffffff',
-    background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
-    border: 'none',
-    borderRadius: '8px',
-    boxShadow: '0 4px 15px rgba(234, 88, 12, 0.4)',
-    transition: 'transform 0.1s ease, filter 0.2s',
-    marginTop: '10px',
-    letterSpacing: '0.3px',
-  },
-};
-
-const pageStyles = {
-  container: {
-    fontSize: '18px', 
-    fontWeight: '600', 
-    color: '#475569',
-    padding: '20px',
-    background: '#ffffff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0'
-  }
-};

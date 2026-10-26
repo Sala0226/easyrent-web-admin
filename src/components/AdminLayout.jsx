@@ -9,7 +9,8 @@ import {
   FiClipboard, 
   FiStar, 
   FiLogOut, 
-  FiMenu 
+  FiMenu,
+  FiUser
 } from 'react-icons/fi';
 
 export default function AdminLayout() {
@@ -30,6 +31,8 @@ export default function AdminLayout() {
     navigate(path);
     setIsMobileMenuOpen(false);
   };
+
+  const currentMenu = menuItems.find(m => m.path === location.pathname);
 
   return (
     <div className="flex min-h-screen bg-slate-100 font-sans relative">
@@ -86,7 +89,7 @@ export default function AdminLayout() {
       <div className="flex-1 md:ml-[260px] flex flex-col w-full">
         {/* Header supérieur */}
         <header className="h-[70px] bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-10">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3.5">
             {/* Bouton Burger (visible sur mobile) */}
             <button
               className="md:hidden bg-none border-none text-xl cursor-pointer text-slate-900 pr-2 flex items-center"
@@ -95,14 +98,22 @@ export default function AdminLayout() {
             >
               <FiMenu size={24} />
             </button>
-            <h2 className="text-xl font-bold text-slate-900 m-0">
-              {menuItems.find(m => m.path === location.pathname)?.label || 'Administration'}
-            </h2>
+
+            <div className="flex items-center gap-3">
+              {currentMenu && (
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shadow-sm">
+                  {React.cloneElement(currentMenu.icon, { size: 20 })}
+                </div>
+              )}
+              <h2 className="text-xl font-bold text-slate-900 m-0">
+                {currentMenu?.label || 'Administration'}
+              </h2>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-9.5 h-9.5 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
-              A
+            <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shadow-sm">
+              <FiUser size={20} />
             </div>
             <div className="hidden sm:block">
               <p className="text-sm font-bold text-slate-900 m-0">Administrateur</p>

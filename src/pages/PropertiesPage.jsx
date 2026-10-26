@@ -5,7 +5,15 @@ import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
 import Pagination from '../components/Pagination';
 import IconButton from '../components/IconButton';
-import { EyeIcon, PowerIcon, RefreshIcon } from '../components/icons';
+import { 
+  FiRefreshCw, 
+  FiHome, 
+  FiCheckCircle, 
+  FiClock, 
+  FiXCircle, 
+  FiEye, 
+  FiPower 
+} from 'react-icons/fi';
 
 export default function PropertiesPage() {
   const { token } = useAuth();
@@ -73,7 +81,7 @@ export default function PropertiesPage() {
           onClick={() => { refresh(); fetchDashboard(); }}
           className="px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
         >
-          <RefreshIcon size={16} /> Actualiser
+          <FiRefreshCw size={16} /> Actualiser
         </button>
       </div>
 
@@ -83,10 +91,11 @@ export default function PropertiesPage() {
         </div>
       )}
 
+      {/* Cartes KPI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
-            🏠
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
+            <FiHome size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Total Propriétés</p>
@@ -95,8 +104,8 @@ export default function PropertiesPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
-            ✅
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
+            <FiCheckCircle size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Validées</p>
@@ -105,8 +114,8 @@ export default function PropertiesPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
-            ⏳
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
+            <FiClock size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">En Attente</p>
@@ -115,8 +124,8 @@ export default function PropertiesPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-red-50 text-red-500 font-bold">
-            🚫
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-red-50 text-red-500 font-bold">
+            <FiXCircle size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Refusées / Suspendues</p>
@@ -127,6 +136,7 @@ export default function PropertiesPage() {
         </div>
       </div>
 
+      {/* Tableau des Annonces */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-5">
         <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Annonces</h3>
 
@@ -185,7 +195,7 @@ export default function PropertiesPage() {
                         <div className="flex gap-2">
                           {/* Voir les détails */}
                           <IconButton
-                            icon={<EyeIcon size={16} />}
+                            icon={<FiEye size={16} />}
                             tooltip="Voir les détails"
                             onClick={() => navigate(`/properties/${prop.id}`)}
                           />
@@ -193,7 +203,7 @@ export default function PropertiesPage() {
                           {/* Suspendre ou Activer la propriété */}
                           <IconButton
                             icon={
-                              <PowerIcon
+                              <FiPower
                                 size={16}
                                 color={prop.status === 'SUSPENDUE' ? '#10b981' : '#ef4444'}
                               />

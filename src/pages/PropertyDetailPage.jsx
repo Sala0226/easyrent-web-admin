@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { ArrowLeftIcon, PowerIcon } from '../components/icons';
+import { FiArrowLeft, FiPower } from 'react-icons/fi';
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -86,7 +86,6 @@ export default function PropertyDetailPage() {
   const getAllImages = () => {
     const images = [];
 
-    // Cas 1: property.images est un tableau d'objets avec url
     if (Array.isArray(property.images)) {
       property.images.forEach(img => {
         const url = extractImageUrl(img);
@@ -94,7 +93,6 @@ export default function PropertyDetailPage() {
       });
     }
 
-    // Cas 2: property.photos est un tableau d'objets avec url
     if (Array.isArray(property.photos)) {
       property.photos.forEach(photo => {
         const url = extractImageUrl(photo);
@@ -102,7 +100,6 @@ export default function PropertyDetailPage() {
       });
     }
 
-    // Cas 3: property.image ou property.imageUrl est une string unique
     if (property.image && typeof property.image === 'string' && !images.includes(property.image)) {
       images.push(property.image);
     }
@@ -125,7 +122,7 @@ export default function PropertyDetailPage() {
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
         >
-          <ArrowLeftIcon size={16} /> Retour
+          <FiArrowLeft size={16} /> Retour
         </button>
 
         <button
@@ -136,7 +133,7 @@ export default function PropertyDetailPage() {
               : 'bg-red-500 text-white shadow-md shadow-red-500/25 hover:bg-red-600 transition-colors'
           }`}
         >
-          <PowerIcon size={16} /> {isSuspended ? 'Activer la propriété' : 'Suspendre la propriété'}
+          <FiPower size={16} /> {isSuspended ? 'Activer la propriété' : 'Suspendre la propriété'}
         </button>
       </div>
 

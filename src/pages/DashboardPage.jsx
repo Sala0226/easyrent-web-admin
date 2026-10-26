@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { RefreshIcon } from '../components/icons';
+import { 
+  FiRefreshCw, 
+  FiUsers, 
+  FiHome, 
+  FiCalendar, 
+  FiCheckCircle, 
+  FiClock, 
+  FiBarChart2, 
+  FiTarget, 
+  FiZap 
+} from 'react-icons/fi';
 
 export default function DashboardPage() {
   const { logout } = useAuth();
@@ -18,16 +28,12 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
 
-      // Récupérer les données depuis le backend endpoint dashboard
       const dashboardResponse = await api.get('/admin/dashboard');
 
       if (dashboardResponse.data) {
-        // Utiliser les stats du dashboard endpoint pour les totaux
-        // Mais récupérer tous les utilisateurs pour calculer correctement les actifs
         const dashboardData = dashboardResponse.data;
 
         try {
-          // Récupérer tous les utilisateurs sans pagination
           const usersRes = await api.get('/admin/users?limit=1000');
           const users = Array.isArray(usersRes.data)
             ? usersRes.data
@@ -59,7 +65,6 @@ export default function DashboardPage() {
           });
         } catch (usersErr) {
           console.log('Could not fetch users details:', usersErr);
-          // Fallback: utiliser les stats du dashboard
           setStats({
             users: {
               total: dashboardData.users?.total || 0,
@@ -82,14 +87,12 @@ export default function DashboardPage() {
           });
         }
       } else {
-        // Fallback: récupérer les données séparément si le dashboard endpoint ne retourne pas tout
         const [usersRes, propertiesRes, visitsRes] = await Promise.all([
           api.get('/admin/users'),
           api.get('/properties'),
           api.get('/visits')
         ]);
 
-        // Handle different response structures for users
         const users = Array.isArray(usersRes.data)
           ? usersRes.data
           : Array.isArray(usersRes.data?.users)
@@ -170,9 +173,9 @@ export default function DashboardPage() {
         <div className="flex gap-3">
           <button
             onClick={fetchDashboardStats}
-            className="px-5 py-3 bg-white text-slate-700 border border-slate-300 rounded-xl font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-all"
+            className="px-5 py-3 bg-white text-slate-700 border border-slate-300 rounded-xl font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2"
           >
-            <RefreshIcon size={16} /> Actualiser
+            <FiRefreshCw size={16} /> Actualiser
           </button>
         </div>
       </div>
@@ -182,7 +185,7 @@ export default function DashboardPage() {
         {/* Carte Utilisateurs */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-blue-50 text-blue-500">
-            👥
+            <FiUsers size={26} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Utilisateurs</p>
@@ -196,7 +199,7 @@ export default function DashboardPage() {
         {/* Carte Propriétés */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-amber-50 text-amber-500">
-            🏠
+            <FiHome size={26} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Propriétés</p>
@@ -210,13 +213,13 @@ export default function DashboardPage() {
         {/* Carte Visites */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-emerald-50 text-emerald-500">
-            📅
+            <FiCalendar size={26} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Visites</p>
             <h3 className="text-2xl font-extrabold text-slate-900 mt-1 mb-0">{stats.visits.total}</h3>
             <p className="text-xs text-slate-500 mt-1 mb-0">
-              En attente: {stats.visits.pending} | Acceptées: {stats.visits.accepted} | Refusées: {stats.visits.refused}
+              En attente: {stats.visits.pending} | Acceptées: {stats.visits.accepted}
             </p>
           </div>
         </div>
@@ -230,7 +233,7 @@ export default function DashboardPage() {
             className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
             onClick={() => window.location.href = '/users'}
           >
-            <span className="text-3xl">👥</span>
+            <span className="text-2xl p-3 bg-blue-50 text-blue-500 rounded-xl"><FiUsers /></span>
             <div>
               <p className="text-sm font-bold text-slate-900 m-0">Gérer les Utilisateurs</p>
               <p className="text-xs text-slate-500 mt-1 mb-0">Activer/désactiver des comptes</p>
@@ -240,7 +243,7 @@ export default function DashboardPage() {
             className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
             onClick={() => window.location.href = '/properties'}
           >
-            <span className="text-3xl">🏠</span>
+            <span className="text-2xl p-3 bg-amber-50 text-amber-500 rounded-xl"><FiHome /></span>
             <div>
               <p className="text-sm font-bold text-slate-900 m-0">Voir les Propriétés</p>
               <p className="text-xs text-slate-500 mt-1 mb-0">Gérer les annonces</p>
@@ -250,10 +253,10 @@ export default function DashboardPage() {
             className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all shadow-sm hover:shadow-md text-left"
             onClick={() => window.location.href = '/visits'}
           >
-            <span className="text-3xl">📅</span>
+            <span className="text-2xl p-3 bg-emerald-50 text-emerald-500 rounded-xl"><FiCalendar /></span>
             <div>
               <p className="text-sm font-bold text-slate-900 m-0">Demandes de Visite</p>
-              <p className="text-xs text-slate-500 mt-1 mb-0">Valider/refuser les visites</p>
+              <p className="text-xs text-slate-500 mt-1 mb-0">Suivi des programmations</p>
             </div>
           </button>
         </div>
@@ -262,7 +265,7 @@ export default function DashboardPage() {
       {/* Statistiques additionnelles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
-          <div className="text-2xl">📊</div>
+          <div className="text-2xl p-3 bg-indigo-50 text-indigo-500 rounded-xl"><FiBarChart2 /></div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Taux d'activation</p>
             <p className="text-lg font-bold text-slate-900 mt-1 mb-0">
@@ -273,7 +276,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
-          <div className="text-2xl">🎯</div>
+          <div className="text-2xl p-3 bg-cyan-50 text-cyan-500 rounded-xl"><FiTarget /></div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Taux de disponibilité</p>
             <p className="text-lg font-bold text-slate-900 mt-1 mb-0">
@@ -284,7 +287,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
-          <div className="text-2xl">⚡</div>
+          <div className="text-2xl p-3 bg-rose-50 text-rose-500 rounded-xl"><FiClock /></div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Visites en attente</p>
             <p className="text-lg font-bold text-slate-900 mt-1 mb-0">{stats.visits.pending}</p>

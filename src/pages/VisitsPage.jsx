@@ -3,7 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
 import Pagination from '../components/Pagination';
-import { RefreshIcon } from '../components/icons';
+import { 
+  FiRefreshCw, 
+  FiCalendar, 
+  FiClock, 
+  FiCheckCircle, 
+  FiXCircle 
+} from 'react-icons/fi';
 
 export default function VisitsPage() {
   const { token } = useAuth();
@@ -72,7 +78,7 @@ export default function VisitsPage() {
           onClick={() => { refresh(); fetchDashboardStats(); }}
           className="px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
         >
-          <RefreshIcon size={16} /> Actualiser
+          <FiRefreshCw size={16} /> Actualiser
         </button>
       </div>
 
@@ -85,8 +91,8 @@ export default function VisitsPage() {
       {/* Grille des KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
-            📅
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
+            <FiCalendar size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Total Demandes</p>
@@ -95,8 +101,8 @@ export default function VisitsPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
-            ⏳
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
+            <FiClock size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">En Attente</p>
@@ -105,8 +111,8 @@ export default function VisitsPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
-            ✅
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
+            <FiCheckCircle size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Acceptées</p>
@@ -115,8 +121,8 @@ export default function VisitsPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-red-50 text-red-500 font-bold">
-            🚫
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-red-50 text-red-500 font-bold">
+            <FiXCircle size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Refusées</p>

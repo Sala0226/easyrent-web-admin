@@ -3,7 +3,14 @@ import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
 import IconButton from '../components/IconButton';
 import Pagination from '../components/Pagination';
-import { PowerIcon, RefreshIcon } from '../components/icons';
+import { 
+  FiRefreshCw, 
+  FiUsers, 
+  FiUser, 
+  FiHome, 
+  FiShield, 
+  FiPower 
+} from 'react-icons/fi';
 
 const PAGE_SIZE = 5;
 
@@ -82,7 +89,7 @@ export default function UsersPage() {
           onClick={handleRefresh}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors"
         >
-          <RefreshIcon size={16} /> Actualiser
+          <FiRefreshCw size={16} /> Actualiser
         </button>
       </div>
 
@@ -95,8 +102,8 @@ export default function UsersPage() {
       {/* Cartes KPI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-sky-50 text-sky-600">
-            👥
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-sky-50 text-sky-600">
+            <FiUsers size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Total Utilisateurs</p>
@@ -104,8 +111,8 @@ export default function UsersPage() {
           </div>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-green-50 text-green-600">
-            🔎
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-green-50 text-green-600">
+            <FiUser size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Clients</p>
@@ -113,8 +120,8 @@ export default function UsersPage() {
           </div>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-orange-50 text-orange-600">
-            🏠
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-orange-50 text-orange-600">
+            <FiHome size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Annonceurs</p>
@@ -122,8 +129,8 @@ export default function UsersPage() {
           </div>
         </div>
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-purple-50 text-purple-600">
-            🛡️
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-purple-50 text-purple-600">
+            <FiShield size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Administrateurs</p>
@@ -191,7 +198,7 @@ export default function UsersPage() {
                     </td>
                     <td className="px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100">
                       <IconButton
-                        icon={<PowerIcon />}
+                        icon={<FiPower size={16} />}
                         label={user.isActive ? 'Désactiver le compte' : 'Activer le compte'}
                         variant={user.isActive ? 'danger' : 'success'}
                         onClick={() => toggleUserStatus(user.id, user.isActive)}

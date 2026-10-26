@@ -3,7 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
 import Pagination from '../components/Pagination';
-import { RefreshIcon } from '../components/icons';
+import { 
+  FiRefreshCw, 
+  FiStar, 
+  FiHome, 
+  FiUsers 
+} from 'react-icons/fi';
 
 export default function FavoritesPage() {
   const { token } = useAuth();
@@ -29,7 +34,6 @@ export default function FavoritesPage() {
 
   const fetchStats = async () => {
     try {
-      // Calculer les stats à partir des favoris récupérés
       const totalFavorites = favorites.length;
       const propertiesWithFavorites = new Set(favorites.map(f => f.propertyId)).size;
       const totalUsers = new Set(favorites.map(f => f.userId)).size;
@@ -59,7 +63,7 @@ export default function FavoritesPage() {
           onClick={() => { refresh(); fetchStats(); }}
           className="px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-semibold cursor-pointer shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
         >
-          <RefreshIcon size={16} /> Actualiser
+          <FiRefreshCw size={16} /> Actualiser
         </button>
       </div>
 
@@ -72,8 +76,8 @@ export default function FavoritesPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
-            ⭐
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-amber-50 text-amber-500 font-bold">
+            <FiStar size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Total Favoris</p>
@@ -82,8 +86,8 @@ export default function FavoritesPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
-            🏠
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-blue-50 text-blue-500 font-bold">
+            <FiHome size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Propriétés Favorisées</p>
@@ -92,8 +96,8 @@ export default function FavoritesPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
-            👥
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-500 font-bold">
+            <FiUsers size={22} />
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-500 m-0">Utilisateurs Actifs</p>

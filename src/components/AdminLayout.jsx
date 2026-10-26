@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoImage from '../assets/logo.png';
+import { 
+  FiGrid, 
+  FiUsers, 
+  FiHome, 
+  FiClipboard, 
+  FiStar, 
+  FiLogOut, 
+  FiMenu 
+} from 'react-icons/fi';
 
 export default function AdminLayout() {
   const { logout } = useAuth();
@@ -10,11 +19,11 @@ export default function AdminLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
-    { path: '/dashboard', label: 'Tableau de Bord', icon: '📊' },
-    { path: '/users', label: 'Utilisateurs', icon: '👥' },
-    { path: '/properties', label: 'Propriétés', icon: '🏠' },
-    { path: '/visits', label: 'Demandes de Visite', icon: '📅' },
-    { path: '/favorites', label: 'Favoris', icon: '⭐' },
+    { path: '/dashboard', label: 'Tableau de Bord', icon: <FiGrid size={20} /> },
+    { path: '/users', label: 'Utilisateurs', icon: <FiUsers size={20} /> },
+    { path: '/properties', label: 'Propriétés', icon: <FiHome size={20} /> },
+    { path: '/visits', label: 'Demandes de Visite', icon: <FiClipboard size={20} /> },
+    { path: '/favorites', label: 'Favoris', icon: <FiStar size={20} /> },
   ];
 
   const handleNavClick = (path) => {
@@ -34,41 +43,41 @@ export default function AdminLayout() {
 
       {/* Sidebar latérale */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-[260px] bg-slate-900 text-white flex flex-col shadow-lg transition-transform duration-300 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-[260px] bg-[#0c1425] text-white flex flex-col transition-transform duration-300 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div className="p-6 flex items-center gap-3 border-b border-slate-800">
+        <div className="p-6 flex items-center gap-3">
           <img src={logoImage} alt="Logo" className="w-9 h-9 rounded-lg object-cover" />
           <span className="text-lg font-extrabold tracking-wide text-white">EASYRENT</span>
         </div>
 
-        <nav className="p-5 flex flex-col gap-1.5 flex-1">
+        <nav className="p-4 flex flex-col gap-2 flex-1">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                className={`flex items-center gap-3.5 px-5 py-3 bg-none border-none text-sm font-semibold cursor-pointer text-left transition-all ${
+                className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium cursor-pointer text-left transition-all ${
                   isActive
-                    ? 'bg-orange-500/15 text-orange-500 border-l-4 border-orange-500'
-                    : 'text-slate-400 border-l-4 border-transparent hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'bg-[#1b253b] text-amber-400 border border-amber-500/30 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#151f33]'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className="flex items-center">{item.icon}</span>
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        <div className="p-5 border-t border-slate-800">
+        <div className="p-4 border-t border-slate-800/60">
           <button
             onClick={logout}
-            className="w-full px-2.5 py-2.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg font-semibold cursor-pointer hover:bg-red-500/20 transition-colors"
+            className="w-full px-4 py-3 bg-[#151f33] text-rose-400 border border-rose-500/30 rounded-xl font-medium cursor-pointer hover:bg-rose-500/10 transition-colors flex items-center justify-center gap-2.5 shadow-sm"
           >
-            Déconnexion
+            <FiLogOut size={18} /> Déconnexion
           </button>
         </div>
       </aside>
@@ -80,11 +89,11 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             {/* Bouton Burger (visible sur mobile) */}
             <button
-              className="md:hidden bg-none border-none text-2xl cursor-pointer text-slate-900 pr-2"
+              className="md:hidden bg-none border-none text-xl cursor-pointer text-slate-900 pr-2 flex items-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Menu"
             >
-              ☰
+              <FiMenu size={24} />
             </button>
             <h2 className="text-xl font-bold text-slate-900 m-0">
               {menuItems.find(m => m.path === location.pathname)?.label || 'Administration'}

@@ -3,8 +3,10 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
+import useDebounce from '../hooks/useDebounce';
 import Pagination from '../components/Pagination';
 import IconButton from '../components/IconButton';
+import SearchInput from '../components/SearchInput';
 import { 
   FiRefreshCw, 
   FiHome, 
@@ -19,6 +21,9 @@ export default function PropertiesPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
+
   const {
     items: rawProperties,
     total,
@@ -28,7 +33,7 @@ export default function PropertiesPage() {
     loading,
     error: fetchError,
     refresh,
-  } = usePaginatedFetch('/admin/properties', 5);
+  } = usePaginatedFetch('/admin/properties', 5, { search: debouncedSearch });
 
   const properties = Array.isArray(rawProperties) ? rawProperties : [];
 
@@ -138,7 +143,14 @@ export default function PropertiesPage() {
 
       {/* Tableau des Annonces */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-5">
-        <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Annonces</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <h3 className="text-lg font-bold text-slate-900">Liste des Annonces</h3>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Rechercher un titre, une ville..."
+          />
+        </div>
 
         {loading ? (
           <p className="text-center py-8 text-slate-500">Chargement des données...</p>

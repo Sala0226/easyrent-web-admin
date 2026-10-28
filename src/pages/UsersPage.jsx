@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
+import useDebounce from '../hooks/useDebounce';
 import IconButton from '../components/IconButton';
 import Pagination from '../components/Pagination';
+import SearchInput from '../components/SearchInput';
 import { 
   FiRefreshCw, 
   FiUsers, 
@@ -15,6 +17,8 @@ import {
 const PAGE_SIZE = 5;
 
 export default function UsersPage() {
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
   const {
     items: users,
     setItems: setUsers,
@@ -25,7 +29,7 @@ export default function UsersPage() {
     loading,
     error,
     refresh,
-  } = usePaginatedFetch('/admin/users', PAGE_SIZE);
+  } = usePaginatedFetch('/admin/users', PAGE_SIZE, { search: debouncedSearch });
 
   const [stats, setStats] = useState({ total: 0, clients: 0, annonceurs: 0, admins: 0 });
   const [notification, setNotification] = useState(null);
@@ -141,7 +145,14 @@ export default function UsersPage() {
 
       {/* Tableau des utilisateurs */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Utilisateurs</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <h3 className="text-lg font-bold text-slate-900">Liste des Utilisateurs</h3>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Rechercher un utilisateur..."
+          />
+        </div>
 
         {loading ? (
           <p className="text-center py-8 text-slate-500">Chargement des données...</p>

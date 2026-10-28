@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import usePaginatedFetch from '../hooks/usePaginatedFetch';
+import useDebounce from '../hooks/useDebounce';
 import Pagination from '../components/Pagination';
+import SearchInput from '../components/SearchInput';
 import { 
   FiRefreshCw, 
   FiStar, 
@@ -13,6 +15,9 @@ import {
 export default function FavoritesPage() {
   const { token } = useAuth();
 
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
+
   const {
     items: rawFavorites,
     total,
@@ -22,7 +27,7 @@ export default function FavoritesPage() {
     loading,
     error: fetchError,
     refresh,
-  } = usePaginatedFetch('/admin/favorites', 10);
+  } = usePaginatedFetch('/admin/favorites', 10, { search: debouncedSearch });
 
   const favorites = Array.isArray(rawFavorites) ? rawFavorites : [];
 
@@ -108,7 +113,14 @@ export default function FavoritesPage() {
 
       {/* Tableau des favoris */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-5">
-        <h3 className="text-lg font-bold text-slate-900 mb-5">Liste des Favoris</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <h3 className="text-lg font-bold text-slate-900">Liste des Favoris</h3>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Rechercher un bien ou un utilisateur..."
+          />
+        </div>
 
         {loading ? (
           <p className="text-center py-8 text-slate-500">Chargement des données...</p>

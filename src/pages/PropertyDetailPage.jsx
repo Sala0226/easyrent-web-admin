@@ -2,7 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { FiArrowLeft, FiPower } from 'react-icons/fi';
+import { FiArrowLeft, FiPower, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+
+const PUBLISHER_TYPE_LABELS = {
+  individual: 'Particulier',
+  agency: 'Agence immobilière',
+  promoter: 'Promoteur immobilier',
+  residence: 'Résidence meublée',
+};
+
+const formatPublisherType = (value) => {
+  if (!value) return null;
+  return PUBLISHER_TYPE_LABELS[value] || value;
+};
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -75,6 +87,21 @@ export default function PropertyDetailPage() {
 
   const isSuspended = property.status === 'SUSPENDUE' || property.status === 'SUSPENDED';
 
+  // En réactivant, on restaure le statut mémorisé avant la suspension.
+  const nextStatus = isSuspended ? property.previousStatus || 'VALIDEE' : 'SUSPENDUE';
+
+  // Informations sur l'annonceur (propriétaire de l'annonce)
+  const owner = property.owner || {};
+  const ownerInitial = owner.name?.trim()?.charAt(0)?.toUpperCase() || 'A';
+  const ownerMemberSince = owner.createdAt
+    ? new Date(owner.createdAt).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null;
+  const publisherTypeLabel = formatPublisherType(owner.publisherType);
+
   // Extraction robuste des images depuis différentes structures possibles
   const extractImageUrl = (img) => {
     if (typeof img === 'string') return img;
@@ -126,14 +153,14 @@ export default function PropertyDetailPage() {
         </button>
 
         <button
-          onClick={() => handleUpdateStatus(isSuspended ? 'VALIDEE' : 'SUSPENDUE')}
-          className={`inline-flex items-center gap-2 px-4.5 py-2.5 border-none rounded-lg font-semibold cursor-pointer ${
+          onClick={() => handleUpdateStatus(nextStatus)}
+          className={`inline-flex items-center justify-center gap-2 min-w-[20px] px-5 py-2.5 border-none rounded-lg text-sm font-semibold cursor-pointer ${
             isSuspended
               ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25 hover:bg-emerald-600 transition-colors'
               : 'bg-red-500 text-white shadow-md shadow-red-500/25 hover:bg-red-600 transition-colors'
           }`}
         >
-          <FiPower size={16} /> {isSuspended ? 'Activer la propriété' : 'Suspendre la propriété'}
+          <FiPower size={16} /> {isSuspended ? 'Réactiver la propriété' : 'Suspendre la propriété'}
         </button>
       </div>
 
@@ -151,6 +178,72 @@ export default function PropertyDetailPage() {
             {property.price ? `${property.price.toLocaleString()} FCFA` : 'N/C'}
           </span>
           {getStatusBadge(property.status)}
+        </div>
+      </div>
+
+      {/* Informations sur l'annonceur */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-slate-900 m-0">Annonceur</h3>
+          {owner.id && (
+            <span
+              className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                owner.isActive === false
+                  ? 'bg-red-50 text-red-700'
+                  : 'bg-emerald-50 text-emerald-700'
+              }`}
+            >
+              {owner.isActive === false ? 'Compte désactivé' : 'Compte actif'}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl font-bold shrink-0">
+            {ownerInitial}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <strong className="text-base text-slate-900">
+                {owner.name || 'Annonceur'}
+              </strong>
+              {publisherTypeLabel && (
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700">
+                  {publisherTypeLabel}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+              <a
+                href={owner.email ? `mailto:${owner.email}` : undefined}
+                className="flex items-center gap-2.5 bg-slate-50 px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-700 no-underline hover:bg-slate-100 transition-colors min-w-0"
+              >
+                <FiMail size={16} className="text-slate-400 shrink-0" />
+                <span className="truncate">{owner.email || 'Email non renseigné'}</span>
+              </a>
+
+              <a
+                href={owner.phone ? `tel:${owner.phone}` : undefined}
+                className="flex items-center gap-2.5 bg-slate-50 px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-700 no-underline hover:bg-slate-100 transition-colors min-w-0"
+              >
+                <FiPhone size={16} className="text-slate-400 shrink-0" />
+                <span className="truncate">{owner.phone || 'Téléphone non renseigné'}</span>
+              </a>
+
+              <div className="flex items-center gap-2.5 bg-slate-50 px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-700 min-w-0">
+                <FiMapPin size={16} className="text-slate-400 shrink-0" />
+                <span className="truncate">{owner.city || 'Ville non renseignée'}</span>
+              </div>
+            </div>
+
+            {ownerMemberSince && (
+              <p className="text-xs text-slate-500 mt-3 mb-0">
+                Membre depuis le {ownerMemberSince}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

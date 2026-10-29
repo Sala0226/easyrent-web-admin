@@ -174,6 +174,13 @@ export default function PropertiesPage() {
                   const favCount = prop._count?.favorites || 0;
                   const isPending = prop.status === 'EN_ATTENTE';
                   const isValidated = prop.status === 'VALIDEE';
+                  const isSuspended = prop.status === 'SUSPENDUE';
+
+                  // En réactivant, on restaure le statut d'avant suspension
+                  // (une annonce encore EN_ATTENTE redevient EN_ATTENTE).
+                  const nextStatus = isSuspended
+                    ? prop.previousStatus || 'VALIDEE'
+                    : 'SUSPENDUE';
 
                   return (
                     <tr key={prop.id} className="border-b border-slate-100">
@@ -220,8 +227,8 @@ export default function PropertiesPage() {
                                 color={prop.status === 'SUSPENDUE' ? '#10b981' : '#ef4444'}
                               />
                             }
-                            tooltip={prop.status === 'SUSPENDUE' ? 'Activer la propriété' : 'Suspendre la propriété'}
-                            onClick={() => handleUpdateStatus(prop.id, prop.status === 'SUSPENDUE' ? 'VALIDEE' : 'SUSPENDUE')}
+                            tooltip={isSuspended ? 'Réactiver la propriété' : 'Suspendre la propriété'}
+                            onClick={() => handleUpdateStatus(prop.id, nextStatus)}
                           />
                         </div>
                       </td>
